@@ -31,6 +31,7 @@ class lrs.LRSView extends lrs.LRSObject
 			@el = el
 
 		@customOutlets = {} if not @customOutlets?
+		
 		# Add additional default custom outlets.
 		#if @el.attr('value') != null then @customOutlets.value =
 		#	get: (el) ->
@@ -213,17 +214,17 @@ class lrs.LRSView extends lrs.LRSObject
 	removeClass: (classes) ->
 		@el.removeClass(classes)
 
-	enable: (recursive = true)->
+	enable: (recursive = true, updateClass = true)->
 		@enabled = true
-		@removeClass 'disabled'
+		@removeClass('disabled') if updateClass
 		if recursive is true
 			for viewName, view of @views
 				view.enable()
 		@
 
-	disable: (recursive = true) ->
+	disable: (recursive = true, updateClass = true) ->
 		@enabled = false
-		@addClass 'disabled'
+		@addClass('disabled') if updateClass
 		if recursive is true
 			for viewName, view of @views
 				view.disable()
@@ -231,12 +232,12 @@ class lrs.LRSView extends lrs.LRSObject
 
 	show: ->
 		@hidden = false
-		@enable()
+		@enable(true, false)
 		@removeClass('hidden')
 
 	hide: ->
 		@hidden = true
-		@disable()
+		@disable(true, false)
 		@addClass('hidden')
 
 	hideAction: -> @hide()
