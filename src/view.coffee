@@ -11,7 +11,7 @@ class lrs.LRSView extends lrs.LRSObject
 	@parseTemplates: ->
 		templateContainer = $('.templates')
 		templateContainer.remove()
-		templateEls = templateContainer.find('[data-template]')
+		templateEls = $(templateContainer.html()).filter('[data-template]')
 		@templates = {}
 
 		for template in templateEls
