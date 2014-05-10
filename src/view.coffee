@@ -32,13 +32,6 @@ class lrs.LRSView extends lrs.LRSObject
 
 		@customOutlets = {} if not @customOutlets?
 		
-		# Add additional default custom outlets.
-		#if @el.attr('value') != null then @customOutlets.value =
-		#	get: (el) ->
-		#		el.attr('value')
-		#	set: (el, value) ->
-		#		el.attr('value', value)
-
 		@_createViews()
 		@_createOutlets()
 		@_createActions()
