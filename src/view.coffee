@@ -240,17 +240,17 @@ class lrs.LRSView.views.ListView extends lrs.LRSView
 	initialize: (content = null) ->
 		@permanentContent = @el.children()
 		@permanentViews = _.clone(@views)
+		@permanentViewsArray = (view.el[0] for name, view of @permanentViews)
 		@setContent(content)
 		super()
 
 	setContent: (content) ->
-		if (!_.isNull(content) and !_.isArray(content))
-			return
+		return if not _.isNull(content) and not _.isArray(content)	
+		return if content is null and @content = []
 			
 		@views = _.clone(@permanentViews)
 		@listViews = []
-		@el.empty()
-		@permanentContent.appendTo(@el)
+		@el.children().not(@permanentViewsArray).remove()
 		
 		if content is null
 			@content = []
