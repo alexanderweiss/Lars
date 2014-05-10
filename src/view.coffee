@@ -1,5 +1,5 @@
 class lrs.LRSView extends lrs.LRSObject
-
+	
 	@isTouch = document.ontouchstart == null
 
 	isView: true
