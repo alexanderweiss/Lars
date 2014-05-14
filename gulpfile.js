@@ -12,8 +12,8 @@ var paths = {
 gulp.task('build', function() {
 	// Minify and copy all JavaScript (except vendor scripts)
 	return gulp.src(paths.scripts)
+		.pipe(concat('lrs.coffee'))
 		.pipe(coffee())
-		.pipe(concat('lrs.js'))
 		.pipe(gulp.dest('lib'))
 		.pipe(uglify())
 		.pipe(rename({suffix: '.min'}))
