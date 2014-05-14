@@ -21,7 +21,7 @@ class lrs.LRSView extends lrs.LRSObject
 			@templates[name] = template.outerHTML
 
 	constructor: (el = null, @options = null, @owner) ->
-		if @template
+		if @template and (not el or el.children().length is 0)
 			@_loadTemplate()
 			if (el)
 				classes = el.attr('class')
