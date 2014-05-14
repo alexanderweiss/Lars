@@ -200,6 +200,9 @@ class lrs.LRSView extends lrs.LRSObject
 
 	insertBefore: (el) ->
 		@el.insertBefore(el)
+		
+	insertAfter: (el) ->
+		@el.insertAfter(el)
 
 	addClass: (classes) ->
 		@el.addClass(classes)
