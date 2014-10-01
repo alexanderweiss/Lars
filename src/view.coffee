@@ -41,6 +41,7 @@ class lrs.LRSView extends lrs.LRSObject
 	initialize: () ->
 		@hidden = @el.hasClass('hidden')
 		@enabled = !@el.hasClass('disabled')
+		
 		for name, view of @views
 			view.initialize()
 		super
@@ -254,7 +255,7 @@ class lrs.LRSView extends lrs.LRSObject
 
 	hideAction: -> @hide()
 
-class lrs.LRSView.views.ListView extends lrs.LRSView
+class lrs.LRSView.views.LRSListView extends lrs.LRSView
 
 	initialize: (content = null) ->
 		@permanentContent = @el.children()
@@ -301,7 +302,7 @@ class lrs.LRSView.views.ListView extends lrs.LRSView
 			if (@options.itemClass)
 				view = new @options.itemClass(null, null, @).initialize(object)
 			else
-				view = new lrs.LRSView.views.GeneratedListItemView(@options.subTemplate, null, @).initialize(object)
+				view = new lrs.LRSView.views.LRSGeneratedListItemView(@options.subTemplate, null, @).initialize(object)
 		else
 			view = object
 		
@@ -312,9 +313,9 @@ class lrs.LRSView.views.ListView extends lrs.LRSView
 		@listViews.splice(i, 0, view)
 		@views[_.uniqueId('lvi_')] = view
 
-class lrs.LRSView.views.ListItemView extends lrs.LRSView
+class lrs.LRSView.views.LRSListItemView extends lrs.LRSView
 
-class lrs.LRSView.views.GeneratedListItemView extends lrs.LRSView.views.ListItemView 
+class lrs.LRSView.views.LRSGeneratedListItemView extends lrs.LRSView.views.LRSListItemView 
 
 	constructor: (template, @options, @owner) ->
 		@template = template if template
