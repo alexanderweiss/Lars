@@ -229,7 +229,7 @@ class lrs.LRSView extends lrs.LRSObject
 		@removeClass('disabled') if updateClass
 		if recursive is true
 			for viewName, view of @views
-				view.enable()
+				view.enable(recursive, updateClass)
 		@
 
 	disable: (recursive = true, updateClass = true) ->
@@ -237,7 +237,7 @@ class lrs.LRSView extends lrs.LRSObject
 		@addClass('disabled') if updateClass
 		if recursive is true
 			for viewName, view of @views
-				view.disable()
+				view.disable(recursive, updateClass)
 		@
 
 	show: ->
