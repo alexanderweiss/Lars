@@ -120,7 +120,6 @@ class lrs.LRSView extends lrs.LRSObject
 					@actions[action[0]] = []
 
 				$el.on(action[0], (e) -> self.delegateAction(e, @))
-				#console.log 'action', action[0], action[1], action[2]
 
 				@actions[action[0]].push({el: $el, function: action[1], parameters: action[2]})
 
@@ -161,7 +160,7 @@ class lrs.LRSView extends lrs.LRSObject
 
 	updateOutletFromDom: (name) ->
 		outlet = @outlets[name]
-		return if not outlet
+		return @ if not outlet
 
 		switch outlet.type
 			#when 'default'
@@ -177,10 +176,12 @@ class lrs.LRSView extends lrs.LRSObject
 			else
 				@[name] = outlet.el.html()
 				#Other el types
+		
+		@
 
 	updateDomFromOutlet: (name) ->
 		outlet = @outlets[name]
-		return if not outlet
+		return @ if not outlet
 
 		switch outlet.type
 			#when 'default'
@@ -195,11 +196,13 @@ class lrs.LRSView extends lrs.LRSObject
 				outlet.el.attr('src', @[name])
 			else
 				outlet.el.html(@[name])
+				
+		@
 
 	set: (name, value) ->
 		@[name] = value
 		@updateDomFromOutlet(name)
-		value
+		@
 
 	appendTo: (el) ->
 		@el.appendTo(el)
@@ -253,7 +256,7 @@ class lrs.LRSView extends lrs.LRSObject
 		@addClass('hidden')
 		@
 
-	hideAction: -> @hide()
+	hideAction: @::hide
 
 class lrs.LRSView.views.LRSListView extends lrs.LRSView
 
