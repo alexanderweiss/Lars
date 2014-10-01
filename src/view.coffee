@@ -126,24 +126,25 @@ class lrs.LRSView extends lrs.LRSObject
 		@actions
 
 	delegateAction: (e, el = false) =>
+		return unless @enabled
+		
 		actions = @actions[e.type]
 
-		if (!actions) then return
+		return unless actions
 
 		for action in actions
 			continue if el != false && action.el[0] != el
 			parameters = []
 
 			for parameter in action.parameters
-				string = parameter.replace(/['"]/g, "") # Could be improved 'hello" now works as well.
-				if string is parameter
-					parameters.push(@[parameter])
+				if parameter is 'null'
+					parameters.push(null)
+				else if parameter.charAt(0).match(/['"]/g) and parameter.charAt(0) is parameter.charAt(parameter.length)
+					parameters.push(parameter.substring(1, parameter.length - 2))
 				else
-					parameters.push(string)
+					parameters.push(@[parameter])
 
-			parameters.push(@)
-			parameters.push(el)
-			parameters.push(e)
+			parameters.push(@, el, e)
 
 			@dispatch(action.function + 'Action', parameters)
 			
