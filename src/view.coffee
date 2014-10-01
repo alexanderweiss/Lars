@@ -202,18 +202,27 @@ class lrs.LRSView extends lrs.LRSObject
 
 	appendTo: (el) ->
 		@el.appendTo(el)
+		@
 
 	insertBefore: (el) ->
 		@el.insertBefore(el)
+		@
 		
 	insertAfter: (el) ->
 		@el.insertAfter(el)
+		@
+		
+	remove: ->
+		@el.remove()
+		@
 
 	addClass: (classes) ->
 		@el.addClass(classes)
+		@
 
 	removeClass: (classes) ->
 		@el.removeClass(classes)
+		@
 
 	enable: (recursive = true, updateClass = true)->
 		@enabled = true
@@ -235,11 +244,13 @@ class lrs.LRSView extends lrs.LRSObject
 		@hidden = false
 		@enable(true, false)
 		@removeClass('hidden')
+		@
 
 	hide: ->
 		@hidden = true
 		@disable(true, false)
 		@addClass('hidden')
+		@
 
 	hideAction: -> @hide()
 
