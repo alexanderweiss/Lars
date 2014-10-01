@@ -148,9 +148,13 @@ class lrs.LRSView extends lrs.LRSObject
 			@dispatch(action.function + 'Action', parameters)
 			
 	dispatch: (func, parameters = null) ->
+		
+		propagate = true
+		
 		if @[func] && _.isFunction(@[func])
-			@[func].apply(@, parameters)
-		else if @owner
+			propagate = @[func].apply(@, parameters)
+			
+		if propagate is true and @owner
 			@owner.dispatch(func, parameters)
 
 	updateOutletFromDom: (name) ->
