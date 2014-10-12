@@ -42,9 +42,16 @@ class lrs.LRSView extends lrs.LRSObject
 		@hidden = @el.hasClass('hidden')
 		@enabled = !@el.hasClass('disabled')
 		
-		for name, view of @views
-			view.initialize()
+		@initializeViews()
+		
 		super
+		
+	initializeViews: ->
+		for name, view of @views
+			if Array.isArray(view)
+				v.initialize() for v in view
+			else
+				view.initialize()
 
 	_loadTemplate: ->
 		@el = $(LRSView.templates[@template])
@@ -55,17 +62,27 @@ class lrs.LRSView extends lrs.LRSObject
 		#console.log @, viewEls
 		for view in viewEls
 			$view = $(view)
-			if !$view.attr('data-view') then continue
+			continue unless $view.attr('data-view')
 			info = $view.attr('data-view').split(':')
 			$view.removeAttr('data-view')
 			#console.log info[0] || info[1], viewEls, '1'
+			
 			if (info.length == 1)
-				@views[info[0]] = new lrs.LRSView($view, null,  @)
+				name = info[0]
+				view = new lrs.LRSView($view, null,  @)
 			else
-				@views[info[1]] = new lrs.LRSView.views[info[0]+'View']($view, {subTemplate: info[2]}, @)
-
-			if info[0] == 'view' then @view = @views[info[0]]
-			else if info[1] == 'view' then @view = @views[info[1]]
+				name = info[1]
+				view = new lrs.LRSView.views[info[0]+'View']($view, {subTemplate: info[2]}, @)
+				
+			if name is 'view'
+				@view = view
+			else
+				if @views[name]
+					unless Array.isArray(@views[name])
+						@views[name] = [@views[name]]
+					@views[name].push(view)
+				else
+					@views[name] = view
 
 	_createOutlets: ->
 		outletEls = @el.find('[data-outlet]')
@@ -233,7 +250,11 @@ class lrs.LRSView extends lrs.LRSObject
 		@removeClass('disabled') if updateClass
 		if recursive is true
 			for viewName, view of @views
-				view.enable(recursive, updateClass)
+				if Array.isArray(view)
+					v.enable(recursive, updateClass) for v in view
+				else
+					view.enable(recursive, updateClass)
+				
 		@
 
 	disable: (recursive = true, updateClass = true) ->
@@ -241,7 +262,10 @@ class lrs.LRSView extends lrs.LRSObject
 		@addClass('disabled') if updateClass
 		if recursive is true
 			for viewName, view of @views
-				view.disable(recursive, updateClass)
+				if Array.isArray(view)
+					v.disable(recursive, updateClass) for v in view
+				else
+					view.disable(recursive, updateClass)
 		@
 
 	show: ->
@@ -261,18 +285,49 @@ class lrs.LRSView extends lrs.LRSObject
 class lrs.LRSView.views.LRSListView extends lrs.LRSView
 
 	initialize: (content = null) ->
-		@permanentContent = @el.children()
-		@permanentViews = _.clone(@views)
-		@permanentViewsArray = (view.el[0] for name, view of @permanentViews)
-		@setContent(content)
+		unless @permanentContent
+			@permanentContent = @el.children()
+			@permanentViews = _.clone(@views)
+			delete @permanentViews.content
+			@permanentViewsArray = (view.el[0] for name, view of @permanentViews)
+		
 		super()
+		
+		if content and @views.content
+			@setPreloadedContent(content)
+		else
+			@setContent(content)
+		
+	setPreloadedContent: (content) ->
+		previousView = null
+		for object, i in content
+			@content.push(object)
+			
+			view = null
+			for v in @views.content
+				if v.el.attr('data-id') is object.id
+					view = v
+					break
+					
+			if view
+				view.initialize(object)
+			else
+				view = new @options.itemClass(null, null, @).initialize(object)
+				if previousView
+					view.insertAfter(previousView.el)
+					@views.content.splice(i, 0, view)
+				else
+					view.appendTo(@el)
+	
+				
+			#@views[_.uniqueId('lvi_')] = view
 
 	setContent: (content) ->
 		return if not _.isNull(content) and not _.isArray(content)	
 		return if content is null and @content = []
 			
-		@views = _.clone(@permanentViews)
-		@listViews = []
+		@views[name] = view for name, view of @permanentViews
+		@views.content = []
 		@el.children().not(@permanentViewsArray).remove()
 		
 		if content is null
@@ -309,12 +364,11 @@ class lrs.LRSView.views.LRSListView extends lrs.LRSView
 		else
 			view = object
 		
-		if i is @listViews.length
+		if i is @views.content.length
 			view.appendTo(@el)
 		else
 			view.el.insertBefore(@listViews[i].el)
-		@listViews.splice(i, 0, view)
-		@views[_.uniqueId('lvi_')] = view
+		@views.content.splice(i, 0, view)
 
 class lrs.LRSView.views.LRSListItemView extends lrs.LRSView
 
