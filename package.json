@@ -1,6 +1,6 @@
 {
-  "name": "LRS",
-  "description": "A simple client-side JavaScript views framework for prototyping and simple projects.",
+  "name": "Lars",
+  "description": "A simple client-side view library written in CoffeeScript. Great for some quick prototyping or bigger projects.",
   "version": "1.0.0",
   "engines": {
 	"node": "0.10.21"
