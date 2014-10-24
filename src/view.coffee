@@ -276,6 +276,31 @@ class lrs.LRSView extends lrs.LRSObject
 		@
 
 	hideAction: @::hide
+	
+	listenTo: (object, event, callback) ->
+		object.on(event, callback)
+		@listeningTo or= []
+		@listeningTo.push(object: object, event: event, callback: callback)
+		@
+		
+	stopListeningTo: (object, event, callback) ->
+		return @ unless @listeningTo
+		for registeredEvent in @listeningTo
+			break if registeredEvent.object is object and registeredEvent.event is event and registeredEvent.callback is callback
+		
+		if registeredEvent
+			registeredEvent.object.off(registeredEvent.event, registeredEvent.callback)
+		
+		@
+	
+	deinitialize: ->
+		if @listeningTo
+			for registeredEvent in @listeningTo
+				registeredEvent.object.off(registeredEvent.event, registeredEvent.callback)
+		
+		@eachView( (view) ->
+			view.deinitialize()	
+		)
 			
 	eachView: (func) ->
 		for viewName, view of @views
