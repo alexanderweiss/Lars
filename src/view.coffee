@@ -47,11 +47,9 @@ class lrs.LRSView extends lrs.LRSObject
 		super
 		
 	initializeViews: ->
-		for name, view of @views
-			if Array.isArray(view)
-				v.initialize() for v in view
-			else
-				view.initialize()
+		@eachView( (view) ->
+			view.initialize()
+		)
 
 	_loadTemplate: ->
 		@el = $(LRSView.templates[@template])
@@ -249,11 +247,9 @@ class lrs.LRSView extends lrs.LRSObject
 		@enabled = true
 		@removeClass('disabled') if updateClass
 		if recursive is true
-			for viewName, view of @views
-				if Array.isArray(view)
-					v.enable(recursive, updateClass) for v in view
-				else
-					view.enable(recursive, updateClass)
+			@eachView( (view) ->
+				view.enable(recursive, updateClass)
+			)
 				
 		@
 
@@ -261,11 +257,10 @@ class lrs.LRSView extends lrs.LRSObject
 		@enabled = false
 		@addClass('disabled') if updateClass
 		if recursive is true
-			for viewName, view of @views
-				if Array.isArray(view)
-					v.disable(recursive, updateClass) for v in view
-				else
-					view.disable(recursive, updateClass)
+			@eachView( (view) ->
+				view.disable(recursive, updateClass)
+			)
+					
 		@
 
 	show: ->
@@ -281,6 +276,13 @@ class lrs.LRSView extends lrs.LRSObject
 		@
 
 	hideAction: @::hide
+			
+	eachView: (func) ->
+		for viewName, view of @views
+			if Array.isArray(view)
+				func(v) for v in view
+			else
+				func(view)
 
 class lrs.LRSView.views.LRSListView extends lrs.LRSView
 
