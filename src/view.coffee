@@ -220,15 +220,15 @@ class lrs.LRSView extends lrs.LRSObject
 		@
 
 	appendTo: (el) ->
-		@el.appendTo(el)
+		@el.appendTo(el.el or el) # Okay?
 		@
 
 	insertBefore: (el) ->
-		@el.insertBefore(el)
+		@el.insertBefore(el.el or el) # Okay?
 		@
 		
 	insertAfter: (el) ->
-		@el.insertAfter(el)
+		@el.insertAfter(el.el or el) # Okay?
 		@
 		
 	remove: ->
