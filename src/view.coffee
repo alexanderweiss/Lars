@@ -371,6 +371,8 @@ class lrs.LRSView.views.LRSListView extends lrs.LRSView
 		else
 			view.el.insertBefore(@listViews[i].el)
 		@views.content.splice(i, 0, view)
+		
+		view
 
 class lrs.LRSView.views.LRSListItemView extends lrs.LRSView
 
