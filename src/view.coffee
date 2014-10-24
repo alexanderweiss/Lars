@@ -1,5 +1,40 @@
 class lrs.LRSView extends lrs.LRSObject
 	
+	@defineOutlets: ->
+		@outletTypes =
+			custom:
+				get: (outlet, view) ->
+					outlet.get(view.el)
+				set: (outlet, view, value) ->
+					outlet.set(view.el, value)
+			input:
+				get: (outlet, view) ->
+					if outlet.el.attr('type') is 'checkbox'
+						outlet.el.prop('checked')
+					else
+						outlet.el.val()
+				set: (outlet, view, value) ->
+					if outlet.el.attr('type') is 'checkbox'
+						outlet.el.prop('checked', value)
+					else
+						outlet.el.val(value)
+			img:
+				get: (outlet, view) ->
+					outlet.el.attr('src')
+				set: (outlet, view, value) ->
+					outlet.el.attr('src', value)
+			html:
+				get: (outlet, view) ->
+					outlet.el.html()
+				set: (outlet, view, value) ->
+					outlet.el.html(value)
+		
+		@outletTypes.default = @outletTypes.html
+		@outletTypes.textarea = @outletTypes.input
+		
+		
+	@defineOutlets()
+	
 	@isTouch = document.ontouchstart == null
 
 	isView: true
@@ -170,47 +205,28 @@ class lrs.LRSView extends lrs.LRSObject
 		if @[func] && _.isFunction(@[func])
 			propagate = @[func].apply(@, parameters)
 			
-		if propagate is true and @owner
+		if propagate is true and @owner?.dispatch
 			@owner.dispatch(func, parameters)
 
 	updateOutletFromDom: (name) ->
 		outlet = @outlets[name]
 		return @ if not outlet
 
-		switch outlet.type
-			#when 'default'
-			when 'custom'
-				outlet.get(@el, @[name])
-			when 'input', 'textarea'
-				if outlet.el.attr('type') is 'checkbox'
-					@[name] = outlet.el.prop('checked')
-				else
-					@[name] = outlet.el.val()
-			when 'img'
-				@[name] = outlet.el.attr('src')
-			else
-				@[name] = outlet.el.html()
-				#Other el types
+		if @constructor.outletTypes[outlet.type]
+			@[name] = @constructor.outletTypes[outlet.type].get(outlet, @)
+		else
+			@[name] = @constructor.outletTypes.default.get(outlet, @)
 		
 		@
 
 	updateDomFromOutlet: (name) ->
 		outlet = @outlets[name]
 		return @ if not outlet
-
-		switch outlet.type
-			#when 'default'
-			when 'custom'
-				outlet.set(@el, @[name])
-			when 'input', 'textarea'
-				if outlet.el.attr('type') is 'checkbox'
-					outlet.el.prop('checked', @[name])
-				else
-					outlet.el.val(@[name])
-			when 'img'
-				outlet.el.attr('src', @[name])
-			else
-				outlet.el.html(@[name])
+		
+		if @constructor.outletTypes[outlet.type]
+			@constructor.outletTypes[outlet.type].set(outlet, @, @[name])
+		else
+			@constructor.outletTypes.default.set(outlet, @, @[name])
 				
 		@
 
