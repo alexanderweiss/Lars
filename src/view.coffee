@@ -189,8 +189,8 @@ class lrs.LRSView extends lrs.LRSObject
 			for parameter in action.parameters
 				if parameter is 'null'
 					parameters.push(null)
-				else if parameter.charAt(0).match(/['"]/g) and parameter.charAt(0) is parameter.charAt(parameter.length)
-					parameters.push(parameter.substring(1, parameter.length - 2))
+				else if parameter.charAt(0).match(/['"]/g) and parameter.charAt(0) is parameter.charAt(parameter.length-1)
+					parameters.push(parameter.substring(1, parameter.length - 1))
 				else
 					parameters.push(@[parameter])
 
@@ -410,7 +410,7 @@ class lrs.LRSView.views.LRSListView extends lrs.LRSView
 		if i is @views.content.length
 			view.appendTo(@el)
 		else
-			view.el.insertBefore(@listViews[i].el)
+			view.el.insertBefore(@views.content[i].el)
 		@views.content.splice(i, 0, view)
 		
 		view
