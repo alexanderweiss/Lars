@@ -346,6 +346,7 @@ class lrs.LRSView.views.LRSListView extends lrs.LRSView
 		
 	setPreloadedContent: (content) ->
 		previousView = null
+		@content = []
 		for object, i in content
 			@content.push(object)
 			
@@ -399,6 +400,12 @@ class lrs.LRSView.views.LRSListView extends lrs.LRSView
 			@content.splice(i, 0, item)
 			
 		@_processObject(item, i)
+		
+	removeItem: (object) ->
+		i = @content.indexOf(object)
+		@content.splice(i, 1)
+		@views.content[i].remove().deinitialize()
+		@views.content.splice(i, 1)
 	
 	_processObject: (object, i) ->
 		#i = _.indexOf(@content, object)
