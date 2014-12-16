@@ -207,6 +207,9 @@ class lrs.LRSView extends lrs.LRSObject
 			
 		if propagate is true and @owner?.dispatch
 			@owner.dispatch(func, parameters)
+			
+	setOwner: (@owner) ->
+		@owner
 
 	updateOutletFromDom: (name) ->
 		outlet = @outlets[name]
