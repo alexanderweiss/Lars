@@ -1,3 +1,6 @@
+# ## LRSObject
+# Base object class. Provides get/set methods and events.
+
 class LRSObject
 
 	@isObject: true
@@ -47,9 +50,6 @@ class LRSObject
 
 	set: (name, value) ->
 		@[name] = value
-
-	setOwner: (@owner) ->
-		@owner
 
 if module?
 	exports.LRSObject = LRSObject
