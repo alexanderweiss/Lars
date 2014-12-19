@@ -1,4 +1,6 @@
-class lrs.LRSView extends lrs.LRSObject
+# ## LRSView
+# View class. Provides outlets, actions, templates, nesting etc.
+class LRSView extends lrs.LRSObject
 	
 	@defineOutlets: ->
 		@outletTypes =
@@ -328,8 +330,10 @@ class lrs.LRSView extends lrs.LRSObject
 			else
 				func(view)
 
-class lrs.LRSView.views.LRSListView extends lrs.LRSView
-
+# ## LRSListView
+# List view class. Allows easy creation and updating of a list of views.
+class LRSListView extends LRSView
+	
 	initialize: (content = null) ->
 		unless @permanentContent
 			@permanentContent = @el.children()
@@ -425,9 +429,9 @@ class lrs.LRSView.views.LRSListView extends lrs.LRSView
 		
 		view
 
-class lrs.LRSView.views.LRSListItemView extends lrs.LRSView
+class LRSListItemView extends LRSView
 
-class lrs.LRSView.views.LRSGeneratedListItemView extends lrs.LRSView.views.LRSListItemView 
+class LRSGeneratedListItemView extends LRSListItemView 
 
 	constructor: (template, @options, @owner) ->
 		@template = template if template
@@ -441,3 +445,9 @@ class lrs.LRSView.views.LRSGeneratedListItemView extends lrs.LRSView.views.LRSLi
 			if (value) then @set(name, value)
 
 		super(@object)
+
+LRSView.views.LRSListView = LRSListView
+LRSView.views.LRSListItemView = LRSListItemView
+LRSView.views.LRSGeneratedListItemView = LRSGeneratedListItemView
+
+lrs.LRSView = LRSView
