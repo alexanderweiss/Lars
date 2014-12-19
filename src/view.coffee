@@ -46,16 +46,30 @@ class LRSView extends lrs.LRSObject
 	@actionPattern = ///^(.*?):(.*?)\((.*?)\)///
 
 	@parseTemplates: ->
-		templateContainer = $('.templates')
-		templateContainer.remove()
-		templateEls = $(templateContainer.html()).filter('[data-template]')
+		
+		# Define templates
 		@templates = {}
-
-		for template in templateEls
-			$template = $(template)
-			name = $template.attr('data-template')
-			$template.removeAttr('data-template')
-			@templates[name] = template.outerHTML
+		
+		# Get all template containers.
+		templateContainers = document.querySelectorAll('.templates')
+		# Go over all of them to handle the templates inside.
+		for templateContainer in templateContainers
+			# Remove it from the DOM first.
+			templateContainer.parentNode.removeChild(templateContainer)
+			# Create a new element and copy the container's HTML into it to create a DOM structure if it was passed in a script tag.
+			templateContainerHTML = document.createElement('div')
+			templateContainerHTML.innerHTML = templateContainer.innerHTML
+			
+			# Iterate all the children (templates)
+			for template in templateContainerHTML.children
+				# Get the name.
+				name = template.getAttribute('data-template')
+				# If it wasn't provided it's not a template; skip.
+				continue unless name
+				# Remove the data-template attribute.
+				template.removeAttribute('data-template')
+				# Save the HTML in @templates.
+				@templates[name] = template.outerHTML
 
 	constructor: (el = null, @options = null, @owner) ->
 		if @template and (not el or el.children().length is 0)
