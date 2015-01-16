@@ -375,87 +375,147 @@ class LRSView extends lrs.LRSObject
 # List view class. Allows easy creation and updating of a list of views.
 class LRSListView extends LRSView
 	
+	# ### initialize
 	initialize: (content = null) ->
-		unless @permanentContent
-			@permanentContent = @el.children()
-			@permanentViews = _.clone(@views)
-			delete @permanentViews.content
-			@permanentViewsArray = (view.el[0] for name, view of @permanentViews)
-		
 		super()
 		
+		# Check if content is provided and if we have views already (it is assumed initialize is not called anymore after proper initialization).
 		if content and @views.content
+			# Yes; it's preloaded content. Use it.
 			@setPreloadedContent(content)
 		else
-			@setContent(content)
-		
-	setPreloadedContent: (content) ->
-		previousView = null
-		@content = []
-		for object, i in content
-			@content.push(object)
+			# No; it's normal content (or nothing). Use it.
+			@reset(content)
 			
+		@
+		
+	# ### setPreloadedContent
+	# Properly initialize the views we already have from the DOM with correct data and get our own references in order.
+	setPreloadedContent: (content) ->
+		
+		# Set content to nothing.
+		@content = []
+		
+		# Prepare for loop.
+		previousView = null
+		
+		# Iterate all objects provided.
+		for object, i in content
+			
+			# Check if we already have a view for them.
+			# Set default to null.
 			view = null
+			
+			# Iterate all our content views.
 			for v in @views.content
-				if v.el.attr('data-id') is object.id
+				# If the data-id attribute is the object's id, it belongs to the object; set view and break from loop.
+				if v.el.getAttribute('data-id') is object.id
 					view = v
 					break
-					
+			
+			# Check if we found a view.
 			if view
+				# Yes; initialize it.
 				view.initialize(object)
 			else
+			# TODO: Order!
 				view = new @options.itemClass(null, null, @).initialize(object)
 				if previousView
 					view.insertAfter(previousView.el)
 					@views.content.splice(i, 0, view)
 				else
 					view.appendTo(@el)
-	
-				
-			#@views[_.uniqueId('lvi_')] = view
+					
+			@content.push(
+				object: object
+				view: view
+			)
 
-	setContent: (content) ->
-		return if not _.isNull(content) and not _.isArray(content)	
-		return if content is null and @content = []
-			
-		@views[name] = view for name, view of @permanentViews
-		@views.content = []
-		@el.children().not(@permanentViewsArray).remove()
+	reset: (content) ->
+		#return console.log('d') if not _.isNull(content) and not _.isArray(content)	
+		return if content is null and (not @content or @content.length is 0)
 		
-		if content is null
-			@content = []
-		else
-			@content = []
+		@views.content or= []
+			
+		if @views.content.length
+			for view in @views.content
+				view.remove().deinitialize()
+			
+		@content = []
+		
+		if content isnt null
 			for object, i in content
-				@content.push object
 				@_processObject(object, i)
+				
+		@
+		
+	setContent: @::reset
 	
-	addItem: (item, before = false) ->
-		#if before
-			#beforeIndex = _.indexOf(@content, item)
-			#@content.splice(beforeIndex, 0, item)
+	sort: (content) ->
+		return if not content.length > 0 or not @content
+		
+		newContent = []
+		newContentViews = []
+		
+		for object in content
+			c = @content[@indexForObject(object)]
+			newContent.push(c)
+			newContentViews.push(c.view)
+		
+		@content = newContent
+		@views.content = newContentViews
+		
+		reinsert = @withdraw()
+		
+		for view in @views.content
+			view.appendTo(@)
+			
+		reinsert()
+	
+	add: (object, before = false) ->
 		if before is true
-			@content.unshift item
 			i = 0
 		else if before is false
-			@content.push item
-			i = @content.length - 1
+			i = @content.length# - 1
 		else
-			i = _.indexOf(@content, before)
-			@content.splice(i, 0, item)
+			i = @indexForObject(before)
+			i = @content.length if i is -1
 			
-		@_processObject(item, i)
+		@_processObject(object, i)
 		
-	removeItem: (object) ->
-		i = @content.indexOf(object)
-		@content.splice(i, 1)
+	addItem: @::add
+		
+	remove: (object) ->
+		i = @indexForObject(object)
+		removed = @content.splice(i, 1)
 		@views.content[i].remove().deinitialize()
 		@views.content.splice(i, 1)
+		
+	removeItem: @::remove
+	
+	# TODO? contentForObject (object) ->
+	indexForObject: (object) ->
+		for c, i in @content
+			if c.object is object
+				return i
+		return -1
+		
+	indexForView: (view) ->
+		for c, i in @content
+			if c.view is view
+				return i
+		return -1
+				
+	viewForObject: (object) ->
+		i = @indexForObject(object)
+		return undefined if i is -1
+		return @content[i].view
+		
+	# TODO? objectForView: (object) ->
 	
 	_processObject: (object, i) ->
-		#i = _.indexOf(@content, object)
-		if (!object.isView)
-			if (@options.itemClass)
+		if not object.isView # TODO: Use a more reliable check.
+			if @options.itemClass
 				view = new @options.itemClass(null, null, @).initialize(object)
 			else
 				view = new lrs.LRSView.views.LRSGeneratedListItemView(@options.subTemplate, null, @).initialize(object)
@@ -465,8 +525,14 @@ class LRSListView extends LRSView
 		if i is @views.content.length
 			view.appendTo(@el)
 		else
-			view.el.insertBefore(@views.content[i].el)
-		@views.content.splice(i, 0, view)
+			@el.insertBefore(view.el, @views.content[i].el)
+			
+		@content.splice(i, 0,
+			object: object
+			view: view
+		)		
+		
+		@views.content.splice(i, 0, view) # TODO: Should we keep the views in the right order or just push?
 		
 		view
 
