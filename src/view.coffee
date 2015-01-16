@@ -276,7 +276,7 @@ class LRSView extends lrs.LRSObject
 		@insertBefore((view.el or view).nextSibling)
 		@
 		
-	retract: ->
+	withdraw: ->
 		parentNode = @el.parentNode
 		nextSibling = @el.nextSibling
 		@el.parentNode.removeChild(@el)
