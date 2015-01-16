@@ -11,25 +11,25 @@ class LRSView extends lrs.LRSObject
 					outlet.set(view.el, value)
 			input:
 				get: (outlet, view) ->
-					if outlet.el.attr('type') is 'checkbox'
-						outlet.el.prop('checked')
+					if outlet.el.type is 'checkbox'
+						outlet.el.checked
 					else
-						outlet.el.val()
+						outlet.el.value
 				set: (outlet, view, value) ->
-					if outlet.el.attr('type') is 'checkbox'
-						outlet.el.prop('checked', value)
+					if outlet.el.type is 'checkbox'
+						outlet.el.checked = value
 					else
-						outlet.el.val(value)
+						outlet.el.value = value
 			img:
 				get: (outlet, view) ->
-					outlet.el.attr('src')
+					outlet.el.src
 				set: (outlet, view, value) ->
-					outlet.el.attr('src', value)
+					outlet.el.src = value
 			html:
 				get: (outlet, view) ->
-					outlet.el.html()
+					outlet.el.innerHTML
 				set: (outlet, view, value) ->
-					outlet.el.html(value)
+					outlet.el.innerHTML = value
 		
 		@outletTypes.default = @outletTypes.html
 		@outletTypes.textarea = @outletTypes.input
@@ -44,8 +44,11 @@ class LRSView extends lrs.LRSObject
 	@views = {}
 
 	@actionPattern = ///^(.*?):(.*?)\((.*?)\)///
-
+	
+	# ### `class` parseTemplates
+	# Collect all templates from the document. Must be called once, before view initialisation.
 	@parseTemplates: ->
+		return if @templates
 		
 		# Define templates
 		@templates = {}
@@ -62,22 +65,22 @@ class LRSView extends lrs.LRSObject
 			
 			# Iterate all the children (templates)
 			for template in templateContainerHTML.children
+				# If no data-template attribute exists skip this element.
+				continue unless template.hasAttribute('data-template')
 				# Get the name.
 				name = template.getAttribute('data-template')
-				# If it wasn't provided it's not a template; skip.
-				continue unless name
 				# Remove the data-template attribute.
 				template.removeAttribute('data-template')
 				# Save the HTML in @templates.
 				@templates[name] = template.outerHTML
 
 	constructor: (el = null, @options = null, @owner) ->
-		if @template and (not el or el.children().length is 0)
+		if @template and (not el or el.children.length is 0)
 			@_loadTemplate()
 			if (el)
 				classes = el.attr('class')
-				if classes then @el.addClass(classes)
-				el.replaceWith(@el)
+				if classes then @el.classList.add(classes.split(' '))
+				el.parentNode.replaceChild(@el, el)
 		else
 			@el = el
 
@@ -90,8 +93,8 @@ class LRSView extends lrs.LRSObject
 		super(@options)
 
 	initialize: () ->
-		@hidden = @el.hasClass('hidden')
-		@enabled = !@el.hasClass('disabled')
+		@hidden = @el.classList.contains('hidden')
+		@enabled = !@el.classList.contains('disabled')
 		
 		@initializeViews()
 		
@@ -103,93 +106,99 @@ class LRSView extends lrs.LRSObject
 		)
 
 	_loadTemplate: ->
-		@el = $(LRSView.templates[@template])
+		_el = document.createElement('div')
+		_el.innerHTML = LRSView.templates[@template]
+		@el = _el.firstChild
 
 	_createViews: ->
-		viewEls = @el.find('[data-view] ')
+		viewEls = @el.querySelectorAll('[data-view]')
 		@views = {}
-		#console.log @, viewEls
-		for view in viewEls
-			$view = $(view)
-			continue unless $view.attr('data-view')
-			info = $view.attr('data-view').split(':')
-			$view.removeAttr('data-view')
-			#console.log info[0] || info[1], viewEls, '1'
+		for viewEl in viewEls
+			continue unless viewEl.hasAttribute('data-view')
+			info = viewEl.getAttribute('data-view').split(':')
+			viewEl.removeAttribute('data-view')
 			
-			if (info.length == 1)
+			if info.length is 1
 				name = info[0]
-				view = new lrs.LRSView($view, null,  @)
+				view = new lrs.LRSView(viewEl, null,  @)
 			else
 				name = info[1]
-				view = new lrs.LRSView.views[info[0]+'View']($view, {subTemplate: info[2]}, @)
+				view = new lrs.LRSView.views[info[0]+'View'](viewEl, {subTemplate: info[2]}, @)
 				
 			if name is 'view'
 				@view = view
+				
+			if @views[name]
+				unless Array.isArray(@views[name])
+					@views[name] = [@views[name]]
+				@views[name].push(view)
 			else
-				if @views[name]
-					unless Array.isArray(@views[name])
-						@views[name] = [@views[name]]
-					@views[name].push(view)
-				else
-					@views[name] = view
+				@views[name] = view
 
 	_createOutlets: ->
-		outletEls = @el.find('[data-outlet]')
-		if (@el.attr('data-outlet')) then outletEls.push(@el)
-
 		@outlets = {}
+		
+		outletEls = @el.querySelectorAll('[data-outlet]')
+		@_createOutlet(@el) if @el.hasAttribute('data-outlet')
 
-		for outlet in outletEls
-			do (outlet) =>
-				$outlet = $(outlet)
-				#info = $outlet.attr('data-view').split(':')
-				#if (info.length == 1)
-				#	info.unshift('default')
-				#@outlets[info[1]] = {type: info[0], el: $outlet}
-				name = $outlet.attr('data-outlet')
-				$outlet.removeAttr('data-outlet')
-				type = (outlet.tagName || '').toLowerCase()
-				if type is 'input' or type is 'textarea'
-					$outlet.on 'change', () => @updateOutletFromDom(name)
-				@outlets[name] = {type: type, el: $outlet}
-
-				@updateOutletFromDom(name)
+		for outletEl in outletEls
+			@_createOutlet(outletEl)
 
 		if (@customOutlets)
 			outlet.type = 'custom' for name, outlet of @customOutlets
-			_.extend(@outlets, @customOutlets)
+			_.extend(@outlets, @customOutlets) # TODO: Update
 
 		@outlets
+		
+	_createOutlet: (outletEl) ->
+		self = @
+		
+		name = outletEl.getAttribute('data-outlet')
+		outletEl.removeAttribute('data-outlet')
+		type = (outletEl.tagName || '').toLowerCase()
+		if type is 'input' or type is 'textarea'
+			outletEl.addEventListener('change', => self.updateOutletFromDom(name))
+		@outlets[name] =
+			type: type
+			el: outletEl
+		
+		@updateOutletFromDom(name)
 
 	_createActions: ->
-		els = @el.find('[data-action]')
-		if (@el.attr('data-action')) then els.push(@el)
-
-		self = @
-
 		@actions = {}
+		
+		actionEls = @el.querySelectorAll('[data-action]')
+		@_createAction(@el) if @el.hasAttribute('data-action')
 
-		for el in els
-			$el = $(el)
-			actionStrings = $el.attr('data-action').split(';')
-			$el.removeAttr('data-action')
-			for string in actionStrings
-				action = string.match(LRSView.actionPattern)
-				action.shift()
-				action[2] = action[2].split(',')
-				action[2] = [] if action[2][0] == ''
-
-				if !lrs.LRSView.isTouch && (action[0] == 'tap' or action[0] == 'singleTap')
-					action[0] = 'click'
-
-				if (!@actions[action[0]])
-					@actions[action[0]] = []
-
-				$el.on(action[0], (e) -> self.delegateAction(e, @))
-
-				@actions[action[0]].push({el: $el, function: action[1], parameters: action[2]})
+		for actionEl in actionEls
+			@_createAction(actionEl)
 
 		@actions
+		
+	_createAction: (actionEl) ->
+		self = @
+		
+		actionStrings = actionEl.getAttribute('data-action').split(';')
+		actionEl.removeAttribute('data-action')
+		for string in actionStrings
+			action = string.match(LRSView.actionPattern) # TODO: Improve reliability; probably use regex.
+			action.shift()
+			action[2] = action[2].split(',')
+			action[2] = [] if action[2][0] == ''
+		
+			if !lrs.LRSView.isTouch && (action[0] == 'tap' or action[0] == 'singleTap')
+				action[0] = 'click'
+		
+			if (!@actions[action[0]])
+				@actions[action[0]] = []
+		
+			actionEl.addEventListener(action[0], (e) -> self.delegateAction(e, @))
+		
+			@actions[action[0]].push(
+				el: actionEl
+				function: action[1]
+				parameters: action[2]
+			)
 
 	delegateAction: (e, el = false) =>
 		return unless @enabled
@@ -199,7 +208,7 @@ class LRSView extends lrs.LRSObject
 		return unless actions
 
 		for action in actions
-			continue if el != false && action.el[0] != el
+			continue if el != false && action.el != el
 			parameters = []
 
 			for parameter in action.parameters
@@ -254,29 +263,47 @@ class LRSView extends lrs.LRSObject
 		@updateDomFromOutlet(name)
 		@
 
-	appendTo: (el) ->
-		@el.appendTo(el.el or el) # Okay?
+	appendTo: (view) ->
+		(view.el or view).appendChild(@el)
 		@
 
-	insertBefore: (el) ->
-		@el.insertBefore(el.el or el) # Okay?
+	insertBefore: (view) ->
+		el = view.el or view
+		el.parentNode.insertBefore(@el, el)
 		@
 		
-	insertAfter: (el) ->
-		@el.insertAfter(el.el or el) # Okay?
+	insertAfter: (view) ->
+		@insertBefore((view.el or view).nextSibling)
 		@
+		
+	retract: ->
+		parentNode = @el.parentNode
+		nextSibling = @el.nextSibling
+		@el.parentNode.removeChild(@el)
+		
+		return ->
+			if nextSibling
+				parentNode.insertBefore(@el, nextSibling)
+			else
+				parentNode.appendChild(@el)
 		
 	remove: ->
-		@el.remove()
+		@el.parentNode.removeChild(@el)
 		@
 
-	addClass: (classes) ->
-		@el.addClass(classes)
+	addClass: (names...) ->
+		@el.classList.add.apply(@el.classList, names)
 		@
 
-	removeClass: (classes) ->
-		@el.removeClass(classes)
+	removeClass: (names...) ->
+		@el.classList.remove.apply(@el.classList, names)
 		@
+	
+	toggleClass: (name, addOrRemove) ->
+		@el.classList.toggle(name, addOrRemove)
+			
+	hasClass: (name) ->
+		@el.classList.contains(name)
 
 	enable: (recursive = true, updateClass = true)->
 		@enabled = true
