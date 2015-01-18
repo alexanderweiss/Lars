@@ -19,7 +19,7 @@ class LRSView extends lrs.LRSObject
 					if outlet.el.type is 'checkbox'
 						outlet.el.checked = if value then true else false
 					else
-						outlet.el.value = if value? then value or ''
+						outlet.el.value = if value? then value else ''
 			img:
 				get: (outlet, view) ->
 					outlet.el.src
@@ -29,7 +29,7 @@ class LRSView extends lrs.LRSObject
 				get: (outlet, view) ->
 					outlet.el.innerHTML
 				set: (outlet, view, value) ->
-					outlet.el.innerHTML = if value? then value or ''
+					outlet.el.innerHTML = if value? then value else ''
 		
 		@outletTypes.default = @outletTypes.html
 		@outletTypes.textarea = @outletTypes.input
