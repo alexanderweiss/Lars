@@ -381,6 +381,10 @@ class LRSListView extends LRSView
 		
 		# Check if content is provided and if we have views already (it is assumed initialize is not called anymore after proper initialization).
 		if content and @views.content
+			
+			# Normalize content views to array if there is only one.
+			@views.content = [@views.content] unless Array.isArray(@views.content)
+			
 			# Yes; it's preloaded content. Use it.
 			@setPreloadedContent(content)
 		else
@@ -406,11 +410,8 @@ class LRSListView extends LRSView
 			# Set default to null.
 			view = null
 			
-			# Normalize content views to array if there is only one.
-			views = if Array.isArray(@views.content) then @views.content else [@views.content]
-			
 			# Iterate all our content views.
-			for v in views
+			for v in @views.content
 				# If the data-id attribute is the object's id, it belongs to the object; set view and break from loop.
 				if v.el.getAttribute('data-id') is object.id
 					view = v
