@@ -9,7 +9,7 @@ class LRSObject
 
 		if (!@options)
 			@options = {}
-		_.extend @options, options
+		_.extend(@options, options)
 
 		@events = {}
 
@@ -19,31 +19,32 @@ class LRSObject
 		@
 
 
-	on: (event, func) ->
+	on: (event, handler) ->
+		throw new Error("Event type missing.") unless event # TODO: Check type?
+		throw new Error("Event handler missing.") unless handler # TODO: Check type?
 
-		if (!@events[event])
-			@events[event] = []
+		@events[event] = [] if not @events[event]
 
-		if (_.indexOf(@events[event], func) == -1)
-			@events[event].push func
+		@events[event].push(handler) unless handler in @events[event]
 
 		@
 
-	off: (event, func) ->
+	off: (event, handler) ->
 
-		if (!@events[event])
-			return
+		return unless @events[event]
 
-		index = _.indexOf(@events[event], func)
+		index = @events[event].indexOf(handler)
 
 		@events[event].splice(index, 1)
 
 		@
 
 	trigger: (event, attributes) ->
-		if(@events[event])
-			_.each @events[event], (func) =>
-				func.apply(@, attributes)
+		return unless @events[event]
+		
+		@events[event].forEach((func) =>
+			func.apply(@, attributes)
+		)
 
 	get: (name) ->
 		@[name]
