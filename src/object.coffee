@@ -20,7 +20,7 @@ class LRSObject
 
 
 	on: (event, handler) ->
-		throw new Error("Event type missing.") unless event # TODO: Check type?
+		throw new Error("Event name missing.") unless event # TODO: Check type?
 		throw new Error("Event handler missing.") unless handler # TODO: Check type?
 
 		@events[event] = [] if not @events[event]
