@@ -24,7 +24,7 @@ class LRSView extends lrs.LRSObject
 				get: (outlet, view) ->
 					outlet.el.src
 				set: (outlet, view, value) ->
-					outlet.el.src = value? or ''
+					outlet.el.src = if value? then value or ''
 			html:
 				get: (outlet, view) ->
 					outlet.el.innerHTML
