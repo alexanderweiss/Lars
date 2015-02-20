@@ -337,7 +337,7 @@ class LRSView extends lrs.LRSObject
 		@addClass('hidden')
 		@
 
-	hideAction: @::hide
+	hideAction: -> @hide()
 	
 	listenTo: (object, event, callback) ->
 		object.on(event, callback)
@@ -453,7 +453,7 @@ class LRSListView extends LRSView
 				
 		@
 		
-	setContent: @::reset
+	setContent: -> @reset()
 	
 	sort: (content) ->
 		return if not content.length > 0 or not @content
@@ -487,15 +487,16 @@ class LRSListView extends LRSView
 			
 		@_processObject(object, i)
 		
-	addItem: @::add
+	addItem: -> @add()
 		
 	remove: (object) ->
 		i = @indexForObject(object)
+		return false if i is -1
 		removed = @content.splice(i, 1)
 		@views.content[i].remove().deinitialize()
 		@views.content.splice(i, 1)
 		
-	removeItem: @::remove
+	removeItem: -> @remove()
 	
 	# TODO? contentForObject (object) ->
 	indexForObject: (object) ->
