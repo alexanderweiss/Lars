@@ -42,9 +42,8 @@ class LRSObject
 	trigger: (event, attributes) ->
 		return unless @events[event]
 		
-		@events[event].forEach((func) =>
-			func.apply(@, attributes)
-		)
+		for handler in @events[event].slice()
+			handler.apply(@, attributes)
 
 	get: (name) ->
 		@[name]
