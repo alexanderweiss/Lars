@@ -277,6 +277,8 @@ class LRSView extends lrs.LRSObject
 		@
 		
 	withdraw: ->
+		scrollTop = @el.scrollTop
+		
 		parentNode = @el.parentNode
 		nextSibling = @el.nextSibling
 		@el.parentNode.removeChild(@el)
@@ -286,6 +288,8 @@ class LRSView extends lrs.LRSObject
 				parentNode.insertBefore(@el, nextSibling)
 			else
 				parentNode.appendChild(@el)
+				
+			@el.scrollTop = scrollTop
 		
 	remove: ->
 		@el.parentNode.removeChild(@el)
