@@ -448,6 +448,7 @@ class LRSListView extends LRSView
 		if @views.content.length
 			for view in @views.content
 				view.remove().deinitialize()
+			@views.content = []
 			
 		@content = []
 		
