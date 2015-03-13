@@ -78,8 +78,8 @@ class LRSView extends lrs.LRSObject
 		if @template and (not el or el.children.length is 0)
 			@_loadTemplate()
 			if (el)
-				classes = el.attr('class')
-				if classes then @el.classList.add(classes.split(' '))
+				#classes = el.attr('class')
+				#if classes then @el.classList.add(classes.split(' '))
 				el.parentNode.replaceChild(@el, el)
 		else
 			@el = el
