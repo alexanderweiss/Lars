@@ -14,10 +14,10 @@ gulp.task('build', function() {
 	return gulp.src(paths.scripts)
 		.pipe(concat('lrs.coffee'))
 		.pipe(coffee())
-		.pipe(gulp.dest('lib'))
+		.pipe(gulp.dest(''))
 		.pipe(uglify())
 		.pipe(rename({suffix: '.min'}))
-		.pipe(gulp.dest('lib'))
+		.pipe(gulp.dest(''))
 });
 
 gulp.task('watch', function() {
