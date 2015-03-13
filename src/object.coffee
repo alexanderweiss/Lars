@@ -28,6 +28,13 @@ class LRSObject
 		@events[event].push(handler) unless handler in @events[event]
 
 		@
+		
+	once: (event, handler) ->
+		intermediateHandler = =>
+			@off(event, intermediateHandler)
+			handler.apply(@, arguments)
+			
+		@on(event, intermediateHandler)
 
 	off: (event, handler) ->
 
