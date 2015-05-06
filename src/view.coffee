@@ -304,7 +304,9 @@ class LRSView extends lrs.LRSObject
 		@
 	
 	toggleClass: (name, addOrRemove) ->
-		@el.classList.toggle(name, addOrRemove)
+		if addOrRemove isnt addOrRemove
+			@el.classList.toggle(name, addOrRemove)
+		@el.classList.toggle(name)
 			
 	hasClass: (name) ->
 		@el.classList.contains(name)

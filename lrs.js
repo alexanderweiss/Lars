@@ -501,7 +501,10 @@
     };
 
     LRSView.prototype.toggleClass = function(name, addOrRemove) {
-      return this.el.classList.toggle(name, addOrRemove);
+      if (addOrRemove !== addOrRemove) {
+        this.el.classList.toggle(name, addOrRemove);
+      }
+      return this.el.classList.toggle(name);
     };
 
     LRSView.prototype.hasClass = function(name) {
