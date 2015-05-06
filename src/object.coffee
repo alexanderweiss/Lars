@@ -25,7 +25,7 @@ class LRSObject
 
 		@events[event] = [] if not @events[event]
 
-		@events[event].push(handler) unless handler in @events[event]
+		@events[event].push(handler) unless handler in @events[event] # TODO: Remove this check?
 
 		@
 		
