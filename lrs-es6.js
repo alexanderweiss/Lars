@@ -85,11 +85,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				var index = -1;
 
-				for (var _i in this._events[eventName]) {
+				for (var i in this._events[eventName]) {
 
-					if (this._events[eventName][_i] === handler || this._events[eventName][_i].handler === handler) {
+					if (this._events[eventName][i] === handler || this._events[eventName][i].handler === handler) {
 
-						index = _i;
+						index = i;
 						break;
 					}
 				}
@@ -733,12 +733,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				return this;
 			}
+
+			// ### addView
+			// Add a view within to this view.
+
 		}, {
 			key: "addView",
 			value: function addView(view, name) {
 
+				// Don't add the view if it already the child of another view.
 				if (view.owner) return this; // TODO: Check this._viewsArray?
 
+				// Set info.
 				view.owner = this;
 				view._name = name;
 
@@ -761,119 +767,173 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				this._viewsArray.push(view);
 			}
+
+			// ### removeView
+			// Remove a view from this view.
+
 		}, {
 			key: "removeView",
 			value: function removeView(view) {
 
+				// Stop if this view isn't actually the owner. TODO: throw error?
 				if (view.owner != this) return this;
 
+				// Stop if the view isn't in the array.
 				var index = this._viewsArray.indexOf(view);
 				if (index < 0) return this;
 
+				// Remove.
 				this._viewsArray.splice(index, 1);
 
+				// Delete if this.view
 				if (this.view === view) delete this.view;
 
+				// Check if the view is actually part of an array.
 				if (Array.isArray(this.views[view.name])) {
 
+					// Yes; find it and remove.
 					var innerIndex = this.views[view.name].indexOf();
 					if (innerIndex < 0) throw new Error('View not found');
 
 					this.views[view.name].splice(innerIndex, 1);
 				} else {
 
+					// No; remove key.
 					delete this.views[view.name];
 				}
 
 				return this;
 			}
+
+			// ### appendTo
+			// Add view element to another element or another view's element in the DOM and add it to the view stack.
+
 		}, {
 			key: "appendTo",
 			value: function appendTo(viewOrEl, name) {
 
+				// Add element.
 				(viewOrEl.el || viewOrEl).appendChild(this.el);
 
+				// If view and name provided, add it to the view stack.
 				if (name && viewOrEl instanceof LRSView) return viewOrEl.addView(this, name);
 
 				return this;
 			}
+
+			// ### insertBefore
+			// Insert view element before another element or another view's element in the DOM and add it to the view stack.
+
 		}, {
 			key: "insertBefore",
 			value: function insertBefore(viewOrEl, name) {
 
+				// Add element.
 				var el = viewOrEl.el || viewOrEl;
 				el.parentNode.insertBefore(this.el, el);
 
-				if (name && viewOrEl instanceof LRSView) return viewOrEl.addView(this, name);
+				// If view and name provided, add it to the view stack.
+				if (name && viewOrEl instanceof LRSView && viewOrEl.owner) return viewOrEl.owner.addView(this, name);
 
 				return this;
 			}
+
+			// ### insertAfter
+			// Insert view element after another element or another view's element in the DOM and add it to the view stack.
+
 		}, {
 			key: "insertAfter",
 			value: function insertAfter(viewOrEl, name) {
 
+				// Get target element.
 				var el = viewOrEl.el || viewOrEl;
 
+				// Check if it has a nextSibling.
 				if (el.nextSibling) {
 
+					// Yes; insert before that.
 					this.insertBefore(el.nextSibling);
 				} else {
 
+					// No; append it as the last element.
 					el.parentNode.appendChild(this.el);
 				}
 
-				if (name && viewOrEl instanceof LRSView) return viewOrEl.addView(this, name);
+				// If view and name provided, add it to the view stack.
+				if (name && viewOrEl instanceof LRSView && viewOrEl.owner) return viewOrEl.owner.addView(this, name);
 
 				return this;
 			}
+
+			// ### remove
+			// Remove view element from DOM and remove view from view stack.
+
 		}, {
 			key: "remove",
-			value: function remove() {
+			value: function remove(removeFromOwner) {
 
 				if (!this.el.parentNode) throw new Error('View element is not in DOM');
 
 				this.el.parentNode.removeChild(this.el);
 
-				//if (removeFromOwner !== false) this.parent.removeView(this)
+				if (removeFromOwner !== false) this.owner.removeView(this);
 
 				return this;
 			}
+
+			// ### withdraw
+			// Temporarily remove the element from the DOM to perform operations and put back in.
+
 		}, {
 			key: "withdraw",
 			value: function withdraw() {
 
+				// Throw error if the view is already withdrawn.
 				if (this._previousState) throw new Error('View is already withdrawn');
 
+				// Save state.
 				this._previousState = {
 					scrollTop: this.el.scrollTop(),
 					parentNode: this.el.parentNode,
 					placeholderEl: document.createElement('div')
 				};
 
+				// Put placeholder element in DOM.
 				this._previousState.parentNode.replaceChild(this._previousState.placeholderEl, this.el);
 
 				return this;
 			}
+
+			// ### `property` classList
+
 		}, {
 			key: "_setEnabled",
+
+			// ### `private` _setEnabled
+			// Update enabled state on this and child views.
 			value: function _setEnabled(newState, options) {
 
 				if (!options) options = {};
 
+				// Set state.
 				this.enabled = newState;
 
+				// Toggle disabled class if required.
 				if (options.updateClass !== false) newState === true ? this.classList.remove('disabled') : this.classList.add('disabled');
 
+				// Check if we aren't specifically disabling recursive change.
 				if (options.recursive !== false) {
+
+					// No; go over all subviews.
 					var _iteratorNormalCompletion10 = true;
 					var _didIteratorError10 = false;
 					var _iteratorError10 = undefined;
 
 					try {
-
 						for (var _iterator10 = this._viewsArray[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
 							var _view2 = _step10.value;
 
+							// Update enabled state of subviews (only updateClass if specifically enabled for recursive updates)
 							_view2._setEnabled(newState, {
 								recursive: true,
 								updateClass: options.updateClass && options.updateClassRecursive === true
@@ -897,72 +957,142 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				return this;
 			}
+
+			// ### enable
+			// Enable interactions.
+
 		}, {
 			key: "enable",
 			value: function enable(options) {
 
 				return this._setEnabled(true, options);
 			}
+
+			// ### disable
+			// Disable interactions.
+
 		}, {
 			key: "disable",
 			value: function disable(options) {
 
 				return this._setEnabled(false, options);
 			}
+
+			// ### show
+			// Show view.
+
 		}, {
 			key: "show",
 			value: function show() {
 
+				// Change hidden state and class and enable.
 				this.hidden = false;
 				this.enable({ updateClass: false });
 				this.classList.remove('hidden');
 
 				return this;
 			}
+
+			// ### hide
+			// Hide view.
+
 		}, {
 			key: "hide",
 			value: function hide() {
 
+				// Change hidden state and class and disable.
 				this.hidden = true;
 				this.disable({ updateClass: false });
 				this.classList.add('hidden');
 
 				return this;
 			}
+
+			// ### hideAction
+			// Proxy for hide.
+
 		}, {
 			key: "hideAction",
 			value: function hideAction() {
 
 				return this.hide();
 			}
+
+			// ### listenTo
+			// Add an event listener to an object that is automatically managed.
+
 		}, {
 			key: "listenTo",
 			value: function listenTo(object, eventName, callback) {
 
+				// Iterate over all registered listeners.
+				for (var i; i < this._listeners; i++) {
+
+					var listener = this._listeners[i];
+
+					// If this listener already exists, return.
+					if (listener.object === object && listener.eventName === eventName && listener.callback === callback) {
+
+						return this;
+					}
+				}
+
+				// Add event listener.
 				object.on(eventName, callback);
 
+				// Track it.
 				this._listeners.push({ object: object, eventName: eventName, callback: callback });
 
 				return this;
 			}
+
+			// ### stopListeningTo
+			// Remove a managed event listener.
+
 		}, {
 			key: "stopListeningTo",
 			value: function stopListeningTo(object, eventName, callback) {
+
+				// Iterate over all registered listeners.
+				for (var i; i < this._listeners; i++) {
+
+					var listener = this._listeners[i];
+
+					// If this is the correct listener, remove it.
+					if (listener.object === object && listener.eventName === eventName && listener.callback === callback) {
+
+						listener.object.off(listener.eventName, listener.callback);
+						this._listeners.splice(i, 1);
+						break;
+					}
+				}
+
+				return this;
+			}
+
+			// ### deconstruct
+			// Stop listening to registered event listeners and deconstruct children.
+
+		}, {
+			key: "deconstruct",
+			value: function deconstruct() {
+
+				// Only allow deconstruction if the view is not in use.
+				if (this.owner) throw new Error('View may not be in view stack. Call remove() first.');
+
+				// Go over all registered listeners and stop listening.
 				var _iteratorNormalCompletion11 = true;
 				var _didIteratorError11 = false;
 				var _iteratorError11 = undefined;
 
 				try {
-
 					for (var _iterator11 = this._listeners[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
 						var listener = _step11.value;
 
-						if (listener.object === object && listener.eventName === eventName && listener.callback === callback) {
-
-							listener.object.off(listener.eventName, listener.callback);
-							break;
-						}
+						listener.object.off(listener.eventName, listener.callback);
 					}
+
+					// Deconstruct all subviews.
 				} catch (err) {
 					_didIteratorError11 = true;
 					_iteratorError11 = err;
@@ -978,23 +1108,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					}
 				}
 
-				return this;
-			}
-		}, {
-			key: "deconstruct",
-			value: function deconstruct() {
-
-				if (view.owner) throw new Error('View may not be in view stack. Call remove() first.');
-
 				var _iteratorNormalCompletion12 = true;
 				var _didIteratorError12 = false;
 				var _iteratorError12 = undefined;
 
 				try {
-					for (var _iterator12 = this._listeners[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
-						var listener = _step12.value;
+					for (var _iterator12 = this._viewsArray[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+						var _view3 = _step12.value;
 
-						listener.object.off(listener.eventName, listener.callback);
+						_view3.deconstruct();
 					}
 				} catch (err) {
 					_didIteratorError12 = true;
@@ -1010,31 +1132,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						}
 					}
 				}
-
-				var _iteratorNormalCompletion13 = true;
-				var _didIteratorError13 = false;
-				var _iteratorError13 = undefined;
-
-				try {
-					for (var _iterator13 = this._viewsArray[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
-						var _view3 = _step13.value;
-
-						_view3.deconstruct();
-					}
-				} catch (err) {
-					_didIteratorError13 = true;
-					_iteratorError13 = err;
-				} finally {
-					try {
-						if (!_iteratorNormalCompletion13 && _iterator13.return) {
-							_iterator13.return();
-						}
-					} finally {
-						if (_didIteratorError13) {
-							throw _iteratorError13;
-						}
-					}
-				}
 			}
 		}, {
 			key: "classList",
@@ -1047,8 +1144,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		return LRSView;
 	}(lrs.LRSObject);
 
-	var LRSListView = function (_lrs$LRSView) {
-		_inherits(LRSListView, _lrs$LRSView);
+	var LRSListView = function (_LRSView) {
+		_inherits(LRSListView, _LRSView);
 
 		function LRSListView() {
 			_classCallCheck(this, LRSListView);
@@ -1065,29 +1162,29 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (!this.views.content) this.views.content = [];
 
 				if (this.views.content.length) {
-					var _iteratorNormalCompletion14 = true;
-					var _didIteratorError14 = false;
-					var _iteratorError14 = undefined;
+					var _iteratorNormalCompletion13 = true;
+					var _didIteratorError13 = false;
+					var _iteratorError13 = undefined;
 
 					try {
 
-						for (var _iterator14 = this.views.content[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
-							view = _step14.value;
+						for (var _iterator13 = this.views.content[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
+							view = _step13.value;
 
 							view.owner = null;
 							view.remove().deconstruct();
 						}
 					} catch (err) {
-						_didIteratorError14 = true;
-						_iteratorError14 = err;
+						_didIteratorError13 = true;
+						_iteratorError13 = err;
 					} finally {
 						try {
-							if (!_iteratorNormalCompletion14 && _iterator14.return) {
-								_iterator14.return();
+							if (!_iteratorNormalCompletion13 && _iterator13.return) {
+								_iterator13.return();
 							}
 						} finally {
-							if (_didIteratorError14) {
-								throw _iteratorError14;
+							if (_didIteratorError13) {
+								throw _iteratorError13;
 							}
 						}
 					}
@@ -1099,9 +1196,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				if (content) {
 
-					for (var _i2; _i2 < content.length; _i2++) {
+					for (var i; i < content.length; i++) {
 
-						this._processObject(content[_i2], _i2);
+						this._processObject(content[i], i);
 					}
 				}
 
@@ -1149,9 +1246,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			key: "indexForObject",
 			value: function indexForObject(object) {
 
-				for (var _i3; _i3 < this.content; _i3++) {
+				for (var i; i < this.content; i++) {
 
-					if (this.content[_i3].object === object) return _i3;
+					if (this.content[i].object === object) return i;
 				}
 
 				return -1;
@@ -1160,9 +1257,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			key: "indexForView",
 			value: function indexForView(view) {
 
-				for (var _i4; _i4 < this.content; _i4++) {
+				for (var i; i < this.content; i++) {
 
-					if (this.content[_i4].view === view) return _i4;
+					if (this.content[i].view === view) return i;
 				}
 
 				return -1;
@@ -1171,7 +1268,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			key: "viewForObject",
 			value: function viewForObject(object) {
 
-				i = this.indexForObject(object);
+				var i = this.indexForObject(object);
 				if (i < 0) return undefined;
 				return this.content[i].view;
 			}
@@ -1217,10 +1314,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}]);
 
 		return LRSListView;
-	}(lrs.LRSView);
+	}(LRSView);
 
-	var LRSListItemView = function (_LRSView) {
-		_inherits(LRSListItemView, _LRSView);
+	var LRSListItemView = function (_LRSView2) {
+		_inherits(LRSListItemView, _LRSView2);
 
 		function LRSListItemView() {
 			_classCallCheck(this, LRSListItemView);
@@ -1242,36 +1339,41 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 		_createClass(LRSGeneratedListItemView, [{
 			key: "object",
+
+			// ### `property` object
 			set: function set(object) {
 
 				this._object = object;
 
-				var _iteratorNormalCompletion15 = true;
-				var _didIteratorError15 = false;
-				var _iteratorError15 = undefined;
+				var _iteratorNormalCompletion14 = true;
+				var _didIteratorError14 = false;
+				var _iteratorError14 = undefined;
 
 				try {
-					for (var _iterator15 = Object.keys(this.outlets)[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
-						var outletName = _step15.value;
+					for (var _iterator14 = Object.keys(this.outlets)[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
+						var outletName = _step14.value;
 
 						var value = object[outletName];
 						if (value !== undefined) this[outletName] = value;
 					}
 				} catch (err) {
-					_didIteratorError15 = true;
-					_iteratorError15 = err;
+					_didIteratorError14 = true;
+					_iteratorError14 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion15 && _iterator15.return) {
-							_iterator15.return();
+						if (!_iteratorNormalCompletion14 && _iterator14.return) {
+							_iterator14.return();
 						}
 					} finally {
-						if (_didIteratorError15) {
-							throw _iteratorError15;
+						if (_didIteratorError14) {
+							throw _iteratorError14;
 						}
 					}
 				}
-			},
+			}
+
+			// ### `property` object
+			,
 			get: function get() {
 
 				return this._object;

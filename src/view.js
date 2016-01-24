@@ -744,7 +744,7 @@ class LRSView extends lrs.LRSObject {
 	
 }
 
-class LRSListView extends lrs.LRSView {
+class LRSListView extends LRSView {
 	
 	reset(content) {
 		
