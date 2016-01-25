@@ -69,6 +69,9 @@ class LRSView extends lrs.LRSObject {
 			
 		}
 		
+		this.hidden = this.el.classList.contains('hidden')
+		this.enabled = !this.el.classList.contains('disabled')
+		
 		this._createViews()
 		this._createOutlets()
 		this._createActions()
@@ -104,6 +107,7 @@ class LRSView extends lrs.LRSObject {
 			
 			// Get info from element.
 			let info = viewEl.getAttribute('data-view').split(':')
+			viewEl.removeAttribute('data-view')
 			
 			let name, view
 			
@@ -137,10 +141,10 @@ class LRSView extends lrs.LRSObject {
 						
 					}
 				
+				}
+				
 				//Create view.
 				view = new this.constructor.views[info[0] + 'View'](viewEl, options)
-				
-				}
 				
 			}
 			
@@ -407,7 +411,7 @@ class LRSView extends lrs.LRSObject {
 		if (!outlet) return this //hrow new Error(`Outlet ${name} does not exist`)
 		
 		// Update value using predefined methods.
-		(this.constructor.outletTypes[outlet.type] || this.constructor.outletTypes.default).set(outlet, this, this.outlets[name].value)
+		;(this.constructor.outletTypes[outlet.type] || this.constructor.outletTypes.default).set(outlet, this, this.outlets[name].value)
 		
 		return this
 		
@@ -573,6 +577,19 @@ class LRSView extends lrs.LRSObject {
 		
 		return this
 		
+		
+	}
+	
+	reinsert() {
+		
+		if (!this._previousState) throw new Error('View is not withdrawn')
+		
+		this._previousState.parentNode.replaceChild(this.el, this._previousState.placeholderEl)
+		this.el.scrollTop = this._previousState.scrollTop
+		
+		this._previousState = null
+		
+		return this
 		
 	}
 	
@@ -817,6 +834,38 @@ class LRSListView extends LRSView {
 		this.views.content[i].owner = null
 		this.views.content[i].remove().deinitilize()
 		this.views.content.splice(i, 1)
+		
+		return this
+		
+	}
+	
+	sort(content) {
+		
+		if (!content.length || !this.content) return this
+		
+		var newContent = []
+		var newContentViews = []
+		
+		for (let object of content) {
+			
+			let c = this.content[this.indexForObject(object)]
+			newContent.push(c)
+			newContentViews.push(c.view)
+			
+		}
+		
+		this.content = newContent
+		this.views.content = newContentViews
+		
+		this.withdraw()
+		
+		for (let view of this.views.content) {
+			
+			view.appendTo(this)
+			
+		}
+		
+		this.reinsert()
 		
 		return this
 		

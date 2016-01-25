@@ -259,6 +259,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				_this.el = el;
 			}
 
+			_this.hidden = _this.el.classList.contains('hidden');
+			_this.enabled = !_this.el.classList.contains('disabled');
+
 			_this._createViews();
 			_this._createOutlets();
 			_this._createActions();
@@ -304,6 +307,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 						// Get info from element.
 						var info = viewEl.getAttribute('data-view').split(':');
+						viewEl.removeAttribute('data-view');
 
 						var name = undefined,
 						    _view = undefined;
@@ -333,10 +337,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 									throw new Error("View class or template " + info[2] + " used as a default does not exist");
 								}
-
-								//Create view.
-								_view = new this.constructor.views[info[0] + 'View'](viewEl, options);
 							}
+
+							//Create view.
+							_view = new this.constructor.views[info[0] + 'View'](viewEl, options);
 						}
 
 						this.addView(_view, name);
@@ -729,7 +733,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (!outlet) return this //hrow new Error(`Outlet ${name} does not exist`)
 
 				// Update value using predefined methods.
-				(this.constructor.outletTypes[outlet.type] || this.constructor.outletTypes.default).set(outlet, this, this.outlets[name].value);
+				;(this.constructor.outletTypes[outlet.type] || this.constructor.outletTypes.default).set(outlet, this, this.outlets[name].value);
 
 				return this;
 			}
@@ -900,6 +904,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				// Put placeholder element in DOM.
 				this._previousState.parentNode.replaceChild(this._previousState.placeholderEl, this.el);
+
+				return this;
+			}
+		}, {
+			key: "reinsert",
+			value: function reinsert() {
+
+				if (!this._previousState) throw new Error('View is not withdrawn');
+
+				this._previousState.parentNode.replaceChild(this.el, this._previousState.placeholderEl);
+				this.el.scrollTop = this._previousState.scrollTop;
+
+				this._previousState = null;
 
 				return this;
 			}
@@ -1243,6 +1260,76 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				return this;
 			}
 		}, {
+			key: "sort",
+			value: function sort(content) {
+
+				if (!content.length || !this.content) return this;
+
+				var newContent = [];
+				var newContentViews = [];
+
+				var _iteratorNormalCompletion14 = true;
+				var _didIteratorError14 = false;
+				var _iteratorError14 = undefined;
+
+				try {
+					for (var _iterator14 = content[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
+						var object = _step14.value;
+
+						var c = this.content[this.indexForObject(object)];
+						newContent.push(c);
+						newContentViews.push(c.view);
+					}
+				} catch (err) {
+					_didIteratorError14 = true;
+					_iteratorError14 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion14 && _iterator14.return) {
+							_iterator14.return();
+						}
+					} finally {
+						if (_didIteratorError14) {
+							throw _iteratorError14;
+						}
+					}
+				}
+
+				this.content = newContent;
+				this.views.content = newContentViews;
+
+				this.withdraw();
+
+				var _iteratorNormalCompletion15 = true;
+				var _didIteratorError15 = false;
+				var _iteratorError15 = undefined;
+
+				try {
+					for (var _iterator15 = this.views.content[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
+						var _view4 = _step15.value;
+
+						_view4.appendTo(this);
+					}
+				} catch (err) {
+					_didIteratorError15 = true;
+					_iteratorError15 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion15 && _iterator15.return) {
+							_iterator15.return();
+						}
+					} finally {
+						if (_didIteratorError15) {
+							throw _iteratorError15;
+						}
+					}
+				}
+
+				this.reinsert();
+
+				return this;
+			}
+		}, {
 			key: "indexForObject",
 			value: function indexForObject(object) {
 
@@ -1345,28 +1432,28 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				this._object = object;
 
-				var _iteratorNormalCompletion14 = true;
-				var _didIteratorError14 = false;
-				var _iteratorError14 = undefined;
+				var _iteratorNormalCompletion16 = true;
+				var _didIteratorError16 = false;
+				var _iteratorError16 = undefined;
 
 				try {
-					for (var _iterator14 = Object.keys(this.outlets)[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
-						var outletName = _step14.value;
+					for (var _iterator16 = Object.keys(this.outlets)[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
+						var outletName = _step16.value;
 
 						var value = object[outletName];
 						if (value !== undefined) this[outletName] = value;
 					}
 				} catch (err) {
-					_didIteratorError14 = true;
-					_iteratorError14 = err;
+					_didIteratorError16 = true;
+					_iteratorError16 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion14 && _iterator14.return) {
-							_iterator14.return();
+						if (!_iteratorNormalCompletion16 && _iterator16.return) {
+							_iterator16.return();
 						}
 					} finally {
-						if (_didIteratorError14) {
-							throw _iteratorError14;
+						if (_didIteratorError16) {
+							throw _iteratorError16;
 						}
 					}
 				}
