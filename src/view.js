@@ -14,7 +14,7 @@ class LRSView extends lrs.LRSObject {
 		this.templates = {}
 		
 		// Go over all elements containing templates.
-		for (let templateContainerEl of document.querySelectorAll('.templates')) {
+		for (let templateContainerEl of Array.from(document.querySelectorAll('.templates'))) {
 			
 			// Remove it from the DOM first.
 			templateContainerEl.parentNode.removeChild(templateContainerEl)
@@ -24,7 +24,7 @@ class LRSView extends lrs.LRSObject {
 			templateContainerHTMLEl.innerHTML = templateContainerEl.innerHTML
 			
 			// Iterate all the children (templates)
-			for (let templateEl of templateContainerHTMLEl) {
+			for (let templateEl of Array.from(templateContainerHTMLEl.children)) {
 				
 				// If no data-template attribute exists skip this element.
 				if (!templateEl.hasAttribute('data-template')) continue
@@ -133,7 +133,7 @@ class LRSView extends lrs.LRSObject {
 						
 					} else if (this.constructor.templates[info[2]]) {
 						
-						options.defaultChildTemplate = this.constructor.templates[info[2]]
+						options.defaultChildTemplate = info[2]
 						
 					} else {
 						
@@ -687,7 +687,7 @@ class LRSView extends lrs.LRSObject {
 	listenTo(object, eventName, callback) {
 		
 		// Iterate over all registered listeners.
-		for (let i; i < this._listeners; i++) {
+		for (let i = 0; i < this._listeners; i++) {
 			
 			let listener = this._listeners[i]
 			
@@ -715,7 +715,7 @@ class LRSView extends lrs.LRSObject {
 	stopListeningTo(object, eventName, callback) {
 		
 		// Iterate over all registered listeners.
-		for (let i; i < this._listeners; i++) {
+		for (let i = 0; i < this._listeners; i++) {
 			
 			let listener = this._listeners[i]
 			
@@ -786,7 +786,7 @@ class LRSListView extends LRSView {
 		
 		if (content) {
 			
-			for (let i; i < content.length; i++) {
+			for (let i = 0; i < content.length; i++) {
 				
 				this._processObject(content[i], i)
 				
@@ -873,7 +873,7 @@ class LRSListView extends LRSView {
 	
 	indexForObject(object) {
 		
-		for (let i; i < this.content; i++) {
+		for (let i = 0; i < this.content; i++) {
 			
 			if (this.content[i].object === object) return i
 			
@@ -885,7 +885,7 @@ class LRSListView extends LRSView {
 	
 	indexForView(view) {
 		
-		for (let i; i < this.content; i++) {
+		for (let i = 0; i < this.content; i++) {
 			
 			if (this.content[i].view === view) return i
 			
@@ -921,7 +921,7 @@ class LRSListView extends LRSView {
 			} else {
 				
 				view = new LRSGeneratedListItemView(null, {
-					defaultChildTemplate: this.options.defaultChildTemplate
+					template: this.options.defaultChildTemplate
 				})
 				view.object = object
 				
@@ -938,11 +938,12 @@ class LRSListView extends LRSView {
 			
 		} else {
 			
-			view.insertBefore(this)
+			view.insertBefore(this.views.content[i])
 			
 		}
 		
 		this.content.splice(i, 0, {object, view})
+		this.views.content.splice(i, 0, view)
 		
 		return view
 		
@@ -1023,7 +1024,12 @@ LRSView.outletTypes = {
 LRSView.outletTypes.default = LRSView.outletTypes.html
 LRSView.outletTypes.textarea = LRSView.outletTypes.input
 
-LRSView.views = {}
+LRSView.views = {
+	LRSListView,
+	LRSListItemView,
+	LRSGeneratedListItemView
+}
+
 LRSView.isTouch = document.ontouchstart == null
 LRSView.actionStringPattern = /^(.*?):([A-Za-z0-9_-]*)(\((.*?)\))?$/
 

@@ -171,7 +171,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				var _iteratorError2 = undefined;
 
 				try {
-					for (var _iterator2 = document.querySelectorAll('.templates')[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+					for (var _iterator2 = Array.from(document.querySelectorAll('.templates'))[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
 						var templateContainerEl = _step2.value;
 
 						// Remove it from the DOM first.
@@ -187,7 +187,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						var _iteratorError3 = undefined;
 
 						try {
-							for (var _iterator3 = templateContainerHTMLEl[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+							for (var _iterator3 = Array.from(templateContainerHTMLEl.children)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
 								var templateEl = _step3.value;
 
 								// If no data-template attribute exists skip this element.
@@ -332,7 +332,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 									options.defaultChildClass = this.constructor.views[info[2] + 'View'];
 								} else if (this.constructor.templates[info[2]]) {
 
-									options.defaultChildTemplate = this.constructor.templates[info[2]];
+									options.defaultChildTemplate = info[2];
 								} else {
 
 									throw new Error("View class or template " + info[2] + " used as a default does not exist");
@@ -1043,7 +1043,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			value: function listenTo(object, eventName, callback) {
 
 				// Iterate over all registered listeners.
-				for (var i; i < this._listeners; i++) {
+				for (var i = 0; i < this._listeners; i++) {
 
 					var listener = this._listeners[i];
 
@@ -1071,7 +1071,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			value: function stopListeningTo(object, eventName, callback) {
 
 				// Iterate over all registered listeners.
-				for (var i; i < this._listeners; i++) {
+				for (var i = 0; i < this._listeners; i++) {
 
 					var listener = this._listeners[i];
 
@@ -1213,7 +1213,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				if (content) {
 
-					for (var i; i < content.length; i++) {
+					for (var i = 0; i < content.length; i++) {
 
 						this._processObject(content[i], i);
 					}
@@ -1333,7 +1333,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			key: "indexForObject",
 			value: function indexForObject(object) {
 
-				for (var i; i < this.content; i++) {
+				for (var i = 0; i < this.content; i++) {
 
 					if (this.content[i].object === object) return i;
 				}
@@ -1344,7 +1344,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			key: "indexForView",
 			value: function indexForView(view) {
 
-				for (var i; i < this.content; i++) {
+				for (var i = 0; i < this.content; i++) {
 
 					if (this.content[i].view === view) return i;
 				}
@@ -1377,7 +1377,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					} else {
 
 						view = new LRSGeneratedListItemView(null, {
-							defaultChildTemplate: this.options.defaultChildTemplate
+							template: this.options.defaultChildTemplate
 						});
 						view.object = object;
 					}
@@ -1385,16 +1385,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				if (view.owner) throw new Error('View is already owned by a view');
 				view.owner = this;
-
+				console.log(i, this.views.content.length, this.views.content[i]);
 				if (i === this.views.content.length) {
 
 					view.appendTo(this);
 				} else {
 
-					view.insertBefore(this);
+					view.insertBefore(this.views.content[i]);
 				}
 
 				this.content.splice(i, 0, { object: object, view: view });
+				this.views.content.splice(i, 0, view);
 
 				return view;
 			}
@@ -1516,7 +1517,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	LRSView.outletTypes.default = LRSView.outletTypes.html;
 	LRSView.outletTypes.textarea = LRSView.outletTypes.input;
 
-	LRSView.views = {};
+	LRSView.views = {
+		LRSListView: LRSListView,
+		LRSListItemView: LRSListItemView,
+		LRSGeneratedListItemView: LRSGeneratedListItemView
+	};
+
 	LRSView.isTouch = document.ontouchstart == null;
 	LRSView.actionStringPattern = /^(.*?):([A-Za-z0-9_-]*)(\((.*?)\))?$/;
 
