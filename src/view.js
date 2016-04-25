@@ -52,7 +52,7 @@ class LRSView extends lrs.LRSObject {
 		this.delegateAction = this.delegateAction.bind(this)
 		
 		// Check to see if we need to load a template and whether we can.
-		if (this.options.template && (!el || el.children.length === 0)) {
+		if ((this.options.template || this.template) && (!el || el.children.length === 0)) {
 			
 			// Yes; load it.
 			this._loadTemplate()
@@ -95,7 +95,7 @@ class LRSView extends lrs.LRSObject {
 	_loadTemplate() {
 		
 		var el = document.createElement('div')
-		el.innerHTML = this.constructor.templates[this.options.template]
+		el.innerHTML = this.constructor.templates[(this.options.template || this.template)]
 		this.el = el.firstChild
 		
 		return this

@@ -244,7 +244,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			_this.delegateAction = _this.delegateAction.bind(_this);
 
 			// Check to see if we need to load a template and whether we can.
-			if (_this.options.template && (!el || el.children.length === 0)) {
+			if ((_this.options.template || _this.template) && (!el || el.children.length === 0)) {
 
 				// Yes; load it.
 				_this._loadTemplate();
@@ -288,7 +288,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			value: function _loadTemplate() {
 
 				var el = document.createElement('div');
-				el.innerHTML = this.constructor.templates[this.options.template];
+				el.innerHTML = this.constructor.templates[this.options.template || this.template];
 				this.el = el.firstChild;
 
 				return this;
