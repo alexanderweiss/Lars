@@ -1,7 +1,7 @@
 {
   "name": "lars",
-  "version": "1.0.0",
   "description": "A simple client-side view library. Great for some quick prototyping or bigger projects.",
+  "version": "1.1.0",
   "author": "Alexander Weiss",
   "license": "MIT",
   "homepage": "https://github.com/alexanderweiss/lars",
