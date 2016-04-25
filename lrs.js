@@ -243,8 +243,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 			_this.delegateAction = _this.delegateAction.bind(_this);
 
-			if (_this.options.owner) _this.owner = _this.options.owner;
-
 			// Check to see if we need to load a template and whether we can.
 			if (_this.options.template && (!el || el.children.length === 0)) {
 
@@ -335,9 +333,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 							// Multiple properties, set name and define options.
 							name = info[1];
-							var options = {
-								owner: this
-							};
+							var options = {};
 
 							// Check if we have a template/subview options. If so, check if we have a corresponding view or template and set the relevant option.
 							if (info.length === 3) {
