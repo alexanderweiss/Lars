@@ -612,18 +612,26 @@ class LRSView extends lrs.LRSObject {
 	
 	// ### `private` _setEnabled
 	// Update enabled state on this and child views.
-	_setEnabled(newState, options) {
+	_setEnabled(newState, {recursive = true, updateClass = true, updateClassRecursive = false, override = false} = {}) {
 		
-		if (!options) options = {}
+		if (override === true) {
+			
+			this.forceDisabled = !newState
+			
+		} else {
+			
+			this.enabledInput = newState
+			
+		}
 		
 		// Set state.
-		this.enabled = newState
+		this.enabled = this.forceDisabled === true ? false : this.enabledInput
 		
 		// Toggle disabled class if required.
-		if (options.updateClass !== false) newState === true ? this.classList.remove('disabled') : this.classList.add('disabled')
+		if (updateClass === true) newState === true ? this.classList.remove('disabled') : this.classList.add('disabled')
 		
 		// Check if we aren't specifically disabling recursive change.
-		if (options.recursive !== false) {
+		if (recursive === true) {
 			
 			// No; go over all subviews.
 			for (let view of this._viewsArray) {
@@ -631,7 +639,9 @@ class LRSView extends lrs.LRSObject {
 				// Update enabled state of subviews (only updateClass if specifically enabled for recursive updates)
 				view._setEnabled(newState, {
 					recursive: true,
-					updateClass: options.updateClass && options.updateClassRecursive === true
+					updateClass: updateClass && updateClassRecursive === true,
+					updateClassRecursive: updateClassRecursive,
+					override: override
 				})
 				
 			}
@@ -664,7 +674,7 @@ class LRSView extends lrs.LRSObject {
 		
 		// Change hidden state and class and enable.
 		this.hidden = false
-		this.enable({updateClass: false})
+		this.enable({updateClass: false, override: true})
 		this.classList.remove('hidden')
 		
 		return this
@@ -677,7 +687,7 @@ class LRSView extends lrs.LRSObject {
 		
 		// Change hidden state and class and disable.
 		this.hidden = true
-		this.disable({updateClass: false})
+		this.disable({updateClass: false, override: true})
 		this.classList.add('hidden')
 		
 		return this
