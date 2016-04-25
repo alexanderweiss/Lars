@@ -51,6 +51,8 @@ class LRSView extends lrs.LRSObject {
 		
 		this.delegateAction = this.delegateAction.bind(this)
 		
+		if (this.options.owner) this.owner = this.options.owner
+		
 		// Check to see if we need to load a template and whether we can.
 		if (this.options.template && (!el || el.children.length === 0)) {
 			
@@ -132,7 +134,9 @@ class LRSView extends lrs.LRSObject {
 				
 				// Multiple properties, set name and define options.
 				name = info[1]
-				let options = {}
+				let options = {
+					owner: this
+				}
 				
 				// Check if we have a template/subview options. If so, check if we have a corresponding view or template and set the relevant option.
 				if (info.length === 3) {
