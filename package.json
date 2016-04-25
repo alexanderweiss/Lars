@@ -1,7 +1,7 @@
 {
   "name": "lars",
-  "description": "A simple client-side view library written in CoffeeScript. Great for some quick prototyping or bigger projects.",
   "version": "1.0.0",
+  "description": "A simple client-side view library. Great for some quick prototyping or bigger projects.",
   "author": "Alexander Weiss",
   "license": "MIT",
   "homepage": "https://github.com/alexanderweiss/lars",
@@ -16,7 +16,6 @@
     "babel-preset-es2015": "^6.3.13",
     "gulp": "~3.5.6",
     "gulp-babel": "^6.1.1",
-    "gulp-coffee": "~1.4.1",
     "gulp-concat": "~2.2.0",
     "gulp-iife": "^0.2.4",
     "gulp-less": "~1.2.3",

@@ -6,7 +6,7 @@
 	"authors": [
 		"Alexander Weiss <ik@alexanderweiss.nl>"
 	],
-	"description": "A simple client-side view library written in CoffeeScript. Great for some quick prototyping or bigger projects.",
+	"description": "A simple client-side view library. Great for some quick prototyping or bigger projects.",
 	"license": "MIT",
 	"ignore": [
 		"**/.*",
