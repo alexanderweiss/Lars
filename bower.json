@@ -1,12 +1,12 @@
 {
 	"name": "lars",
 	"main": "lrs.js",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"homepage": "https://github.com/alexanderweiss/lars",
 	"authors": [
 		"Alexander Weiss <ik@alexanderweiss.nl>"
 	],
-	"description": "A simple client-side view library written in CoffeeScript. Great for some quick prototyping or bigger projects.",
+	"description": "A simple client-side view library. Great for some quick prototyping or bigger projects.",
 	"license": "MIT",
 	"ignore": [
 		"**/.*",

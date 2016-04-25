@@ -14,7 +14,7 @@ class LRSView extends lrs.LRSObject {
 		this.templates = {}
 		
 		// Go over all elements containing templates.
-		for (let templateContainerEl of document.querySelectorAll('.templates')) {
+		for (let templateContainerEl of Array.from(document.querySelectorAll('.templates'))) {
 			
 			// Remove it from the DOM first.
 			templateContainerEl.parentNode.removeChild(templateContainerEl)
@@ -24,7 +24,7 @@ class LRSView extends lrs.LRSObject {
 			templateContainerHTMLEl.innerHTML = templateContainerEl.innerHTML
 			
 			// Iterate all the children (templates)
-			for (let templateEl of templateContainerHTMLEl) {
+			for (let templateEl of Array.from(templateContainerHTMLEl.children)) {
 				
 				// If no data-template attribute exists skip this element.
 				if (!templateEl.hasAttribute('data-template')) continue
@@ -69,12 +69,25 @@ class LRSView extends lrs.LRSObject {
 			
 		}
 		
-		this._createViews()
-		this._createOutlets()
-		this._createActions()
+		this.hidden = this.el.classList.contains('hidden')
+		this.enabled = !this.el.classList.contains('disabled')
+		
+		if (!options || options.delayDomConnectionCreation !== true) this.createDomConnections()
 
 		return this
 
+	}
+	
+	createDomConnections() {
+		
+		if (this._domConnectionsCreated) throw new Error('DOM connections may only be create once.')
+		
+		this._domConnectionsCreated = true
+		
+		this._createViews()
+		this._createOutlets()
+		this._createActions()
+		
 	}
 	
 	// ### `private` loadTemplate
@@ -104,6 +117,7 @@ class LRSView extends lrs.LRSObject {
 			
 			// Get info from element.
 			let info = viewEl.getAttribute('data-view').split(':')
+			viewEl.removeAttribute('data-view')
 			
 			let name, view
 			
@@ -129,7 +143,7 @@ class LRSView extends lrs.LRSObject {
 						
 					} else if (this.constructor.templates[info[2]]) {
 						
-						options.defaultChildTemplate = this.constructor.templates[info[2]]
+						options.defaultChildTemplate = info[2]
 						
 					} else {
 						
@@ -137,10 +151,10 @@ class LRSView extends lrs.LRSObject {
 						
 					}
 				
+				}
+				
 				//Create view.
 				view = new this.constructor.views[info[0] + 'View'](viewEl, options)
-				
-				}
 				
 			}
 			
@@ -407,7 +421,7 @@ class LRSView extends lrs.LRSObject {
 		if (!outlet) return this //hrow new Error(`Outlet ${name} does not exist`)
 		
 		// Update value using predefined methods.
-		(this.constructor.outletTypes[outlet.type] || this.constructor.outletTypes.default).set(outlet, this, this.outlets[name].value)
+		;(this.constructor.outletTypes[outlet.type] || this.constructor.outletTypes.default).set(outlet, this, this.outlets[name].value)
 		
 		return this
 		
@@ -576,6 +590,19 @@ class LRSView extends lrs.LRSObject {
 		
 	}
 	
+	reinsert() {
+		
+		if (!this._previousState) throw new Error('View is not withdrawn')
+		
+		this._previousState.parentNode.replaceChild(this.el, this._previousState.placeholderEl)
+		this.el.scrollTop = this._previousState.scrollTop
+		
+		this._previousState = null
+		
+		return this
+		
+	}
+	
 	// ### `property` classList
 	get classList() {
 		
@@ -585,18 +612,26 @@ class LRSView extends lrs.LRSObject {
 	
 	// ### `private` _setEnabled
 	// Update enabled state on this and child views.
-	_setEnabled(newState, options) {
+	_setEnabled(newState, {recursive = true, updateClass = true, updateClassRecursive = false, override = false} = {}) {
 		
-		if (!options) options = {}
+		if (override === true) {
+			
+			this.forceDisabled = !newState
+			
+		} else {
+			
+			this.enabledInput = newState
+			
+		}
 		
 		// Set state.
-		this.enabled = newState
+		this.enabled = this.forceDisabled === true ? false : this.enabledInput
 		
 		// Toggle disabled class if required.
-		if (options.updateClass !== false) newState === true ? this.classList.remove('disabled') : this.classList.add('disabled')
+		if (updateClass === true) newState === true ? this.classList.remove('disabled') : this.classList.add('disabled')
 		
 		// Check if we aren't specifically disabling recursive change.
-		if (options.recursive !== false) {
+		if (recursive === true) {
 			
 			// No; go over all subviews.
 			for (let view of this._viewsArray) {
@@ -604,7 +639,9 @@ class LRSView extends lrs.LRSObject {
 				// Update enabled state of subviews (only updateClass if specifically enabled for recursive updates)
 				view._setEnabled(newState, {
 					recursive: true,
-					updateClass: options.updateClass && options.updateClassRecursive === true
+					updateClass: updateClass && updateClassRecursive === true,
+					updateClassRecursive: updateClassRecursive,
+					override: override
 				})
 				
 			}
@@ -637,7 +674,7 @@ class LRSView extends lrs.LRSObject {
 		
 		// Change hidden state and class and enable.
 		this.hidden = false
-		this.enable({updateClass: false})
+		this.enable({updateClass: false, override: true})
 		this.classList.remove('hidden')
 		
 		return this
@@ -650,7 +687,7 @@ class LRSView extends lrs.LRSObject {
 		
 		// Change hidden state and class and disable.
 		this.hidden = true
-		this.disable({updateClass: false})
+		this.disable({updateClass: false, override: true})
 		this.classList.add('hidden')
 		
 		return this
@@ -670,7 +707,7 @@ class LRSView extends lrs.LRSObject {
 	listenTo(object, eventName, callback) {
 		
 		// Iterate over all registered listeners.
-		for (let i; i < this._listeners; i++) {
+		for (let i = 0; i < this._listeners; i++) {
 			
 			let listener = this._listeners[i]
 			
@@ -698,7 +735,7 @@ class LRSView extends lrs.LRSObject {
 	stopListeningTo(object, eventName, callback) {
 		
 		// Iterate over all registered listeners.
-		for (let i; i < this._listeners; i++) {
+		for (let i = 0; i < this._listeners; i++) {
 			
 			let listener = this._listeners[i]
 			
@@ -744,7 +781,7 @@ class LRSView extends lrs.LRSObject {
 	
 }
 
-class LRSListView extends lrs.LRSView {
+class LRSListView extends LRSView {
 	
 	reset(content) {
 		
@@ -769,7 +806,7 @@ class LRSListView extends lrs.LRSView {
 		
 		if (content) {
 			
-			for (let i; i < content.length; i++) {
+			for (let i = 0; i < content.length; i++) {
 				
 				this._processObject(content[i], i)
 				
@@ -822,9 +859,41 @@ class LRSListView extends lrs.LRSView {
 		
 	}
 	
+	sort(content) {
+		
+		if (!content.length || !this.content) return this
+		
+		var newContent = []
+		var newContentViews = []
+		
+		for (let object of content) {
+			
+			let c = this.content[this.indexForObject(object)]
+			newContent.push(c)
+			newContentViews.push(c.view)
+			
+		}
+		
+		this.content = newContent
+		this.views.content = newContentViews
+		
+		this.withdraw()
+		
+		for (let view of this.views.content) {
+			
+			view.appendTo(this)
+			
+		}
+		
+		this.reinsert()
+		
+		return this
+		
+	}
+	
 	indexForObject(object) {
 		
-		for (let i; i < this.content; i++) {
+		for (let i = 0; i < this.content; i++) {
 			
 			if (this.content[i].object === object) return i
 			
@@ -836,7 +905,7 @@ class LRSListView extends lrs.LRSView {
 	
 	indexForView(view) {
 		
-		for (let i; i < this.content; i++) {
+		for (let i = 0; i < this.content; i++) {
 			
 			if (this.content[i].view === view) return i
 			
@@ -872,7 +941,7 @@ class LRSListView extends lrs.LRSView {
 			} else {
 				
 				view = new LRSGeneratedListItemView(null, {
-					defaultChildTemplate: this.options.defaultChildTemplate
+					template: this.options.defaultChildTemplate
 				})
 				view.object = object
 				
@@ -889,11 +958,12 @@ class LRSListView extends lrs.LRSView {
 			
 		} else {
 			
-			view.insertBefore(this)
+			view.insertBefore(this.views.content[i])
 			
 		}
 		
 		this.content.splice(i, 0, {object, view})
+		this.views.content.splice(i, 0, view)
 		
 		return view
 		
@@ -974,7 +1044,12 @@ LRSView.outletTypes = {
 LRSView.outletTypes.default = LRSView.outletTypes.html
 LRSView.outletTypes.textarea = LRSView.outletTypes.input
 
-LRSView.views = {}
+LRSView.views = {
+	LRSListView,
+	LRSListItemView,
+	LRSGeneratedListItemView
+}
+
 LRSView.isTouch = document.ontouchstart == null
 LRSView.actionStringPattern = /^(.*?):([A-Za-z0-9_-]*)(\((.*?)\))?$/
 
