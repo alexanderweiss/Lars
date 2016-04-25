@@ -1,7 +1,7 @@
 # Lars
 
-A simple client-side view library written in CoffeeScript. Great for some quick prototyping or bigger projects.
-Requires underscore and jQuery (for views) and provides an Object class with events and get/set, a View class with templating, outlets, actions, and several more specific view classes.
+A simple client-side JS view library. Great for some quick prototyping or bigger projects.
+With no dependencies it provides an Object class with events and get/set, a View class with templating, outlets, actions, and several more specific view classes.
 
 No docs for now, but some quick pointers:
 
