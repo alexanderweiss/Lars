@@ -72,12 +72,22 @@ class LRSView extends lrs.LRSObject {
 		this.hidden = this.el.classList.contains('hidden')
 		this.enabled = !this.el.classList.contains('disabled')
 		
-		this._createViews()
-		this._createOutlets()
-		this._createActions()
+		if (!options || options.delayDomConnectionCreation !== true) this.createDomConnections()
 
 		return this
 
+	}
+	
+	createDomConnections() {
+		
+		if (this._domConnectionsCreated) throw new Error('DOM connections may only be create once.')
+		
+		this._domConnectionsCreated = true
+		
+		this._createViews()
+		this._createOutlets()
+		this._createActions()
+		
 	}
 	
 	// ### `private` loadTemplate
