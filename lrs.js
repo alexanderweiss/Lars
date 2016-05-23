@@ -13,8 +13,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 ;(function () {
 	"use strict";
 
-	'use strict';
-
 	// ## LRSObject
 	// Basic object class with get/set methods and events.
 
@@ -23,8 +21,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
 			_classCallCheck(this, LRSObject);
-
-			if (!options) options = {};
 
 			this.options = options;
 
@@ -35,6 +31,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 		// ### on
 		// Add an event listener.
+
 
 		_createClass(LRSObject, [{
 			key: "on",
@@ -116,6 +113,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					for (var _iterator = this._events[eventName].slice()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 						var handler = _step.value;
 
+
 						handler.apply(this, args);
 					}
 				} catch (err) {
@@ -140,13 +138,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 	window.lrs = window.lrs || {};
 	window.lrs.LRSObject = LRSObject;
-})();
-
-;(function () {
-	"use strict";
-
-	'use strict';
-
 	// ## LRSView
 	// View class. Provides outlets, actions, templates, nesting etc.
 
@@ -155,6 +146,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 		_createClass(LRSView, null, [{
 			key: "parseTemplates",
+
 
 			// ### `static` parseTemplates
 			// Collect all templates from the document. Must be called once, before view initialisation.
@@ -174,6 +166,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					for (var _iterator2 = Array.from(document.querySelectorAll('.templates'))[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
 						var templateContainerEl = _step2.value;
 
+
 						// Remove it from the DOM first.
 						templateContainerEl.parentNode.removeChild(templateContainerEl);
 
@@ -189,6 +182,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						try {
 							for (var _iterator3 = Array.from(templateContainerHTMLEl.children)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
 								var templateEl = _step3.value;
+
 
 								// If no data-template attribute exists skip this element.
 								if (!templateEl.hasAttribute('data-template')) continue;
@@ -232,8 +226,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			}
 		}]);
 
-		function LRSView(el, options) {
+		function LRSView() {
 			var _ret;
+
+			var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+			var el = _ref.el;
+			var template = _ref.template;
+			var options = _ref.options;
 
 			_classCallCheck(this, LRSView);
 
@@ -244,10 +244,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			_this.delegateAction = _this.delegateAction.bind(_this);
 
 			// Check to see if we need to load a template and whether we can.
-			if ((_this.options.template || _this.template) && (!el || el.children.length === 0)) {
+			if ((template || _this.template) && (!el || el.children.length === 0)) {
 
 				// Yes; load it.
-				_this._loadTemplate();
+				_this._loadTemplate(template || _this.template);
 
 				// Put it in the DOM if we are there already.
 				if (el && el.parentNode) {
@@ -285,10 +285,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 		}, {
 			key: "_loadTemplate",
-			value: function _loadTemplate() {
+			value: function _loadTemplate(template) {
 
 				var el = document.createElement('div');
-				el.innerHTML = this.constructor.templates[this.options.template || this.template];
+				el.innerHTML = this.constructor.templates[template];
 				this.el = el.firstChild;
 
 				return this;
@@ -313,6 +313,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					for (var _iterator4 = Array.from(this.el.querySelectorAll('[data-view]'))[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
 						var viewEl = _step4.value;
 
+
 						// Skip the element if it has already been processed (prevents nested views from being reprocessed at the wrong level).
 						if (!viewEl.hasAttribute('data-view')) continue;
 
@@ -320,15 +321,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						var info = viewEl.getAttribute('data-view').split(':');
 						viewEl.removeAttribute('data-view');
 
-						var name = undefined,
-						    _view = undefined;
+						var name = void 0,
+						    _view = void 0;
 
 						// Check definition type.
 						if (info.length === 1) {
 
 							// Just one property, set name and create a generic view.
 							name = info[0];
-							_view = new lrs.LRSView(viewEl, null);
+							_view = new lrs.LRSView({ el: viewEl });
 						} else {
 
 							// Multiple properties, set name and define options.
@@ -351,7 +352,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 							}
 
 							//Create view.
-							_view = new this.constructor.views[info[0] + 'View'](viewEl, options);
+							_view = new this.constructor.views[info[0] + 'View']({ el: viewEl, options: options });
 						}
 
 						this.addView(_view, name);
@@ -395,6 +396,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					for (var _iterator5 = Array.from(this.el.querySelectorAll('[data-outlet]'))[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
 						var outletEl = _step5.value;
 
+
 						// Create an outlet.
 						this._createOutlet(outletEl);
 					}
@@ -425,6 +427,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					try {
 						for (var _iterator6 = Object.keys(this.customOutlets)[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
 							var customOutletName = _step6.value;
+
 
 							// Add them to our outlets and define their type.
 							this.outlets[customOutletName] = this.customOutlets[customOutletName];
@@ -519,6 +522,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					for (var _iterator7 = Array.from(this.el.querySelectorAll('[data-action]'))[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
 						var actionEl = _step7.value;
 
+
 						// Create an outlet.
 						this._createAction(actionEl);
 					}
@@ -564,6 +568,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					for (var _iterator8 = actionStrings[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
 						var actionString = _step8.value;
 
+
 						// Parse.
 
 						var _actionString$match = actionString.match(this.constructor.actionStringPattern);
@@ -573,6 +578,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						var eventName = _actionString$match2[1];
 						var name = _actionString$match2[2];
 						var parameterString = _actionString$match2[4];
+
 
 						var parameters = parameterString.split(',');
 						if (parameters.length === 1 && parameters[0] === '') parameters = [];
@@ -614,6 +620,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			value: function delegateAction(e) {
 				var el = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
 
+
 				// Don't do anything if we are disabled.
 				if (!this.enabled) return;
 
@@ -629,6 +636,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				try {
 					for (var _iterator9 = actions[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
 						var action = _step9.value;
+
 
 						// Check if the action belongs to the element that we are delegating for.
 						if (el != null && action.el != el) continue;
@@ -658,7 +666,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 								} else {
 
 								// Otherwise, consider it a property name and return property value.
-								parameters.push(this[parameter]);
+								parameters.push(this[parameter] || this.get(parameter));
 							}
 						}
 
@@ -693,6 +701,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			key: "dispatch",
 			value: function dispatch(methodName) {
 				var parameters = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+
 
 				// Start out expecting the need to propagate.
 				var propagate = true;
@@ -937,19 +946,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}, {
 			key: "_setEnabled",
 
+
 			// ### `private` _setEnabled
 			// Update enabled state on this and child views.
 			value: function _setEnabled(newState) {
-				var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+				var _ref2 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-				var _ref$recursive = _ref.recursive;
-				var recursive = _ref$recursive === undefined ? true : _ref$recursive;
-				var _ref$updateClass = _ref.updateClass;
-				var updateClass = _ref$updateClass === undefined ? true : _ref$updateClass;
-				var _ref$updateClassRecur = _ref.updateClassRecursive;
-				var updateClassRecursive = _ref$updateClassRecur === undefined ? false : _ref$updateClassRecur;
-				var _ref$override = _ref.override;
-				var override = _ref$override === undefined ? false : _ref$override;
+				var _ref2$recursive = _ref2.recursive;
+				var recursive = _ref2$recursive === undefined ? true : _ref2$recursive;
+				var _ref2$updateClass = _ref2.updateClass;
+				var updateClass = _ref2$updateClass === undefined ? true : _ref2$updateClass;
+				var _ref2$updateClassRecu = _ref2.updateClassRecursive;
+				var updateClassRecursive = _ref2$updateClassRecu === undefined ? false : _ref2$updateClassRecu;
+				var _ref2$override = _ref2.override;
+				var override = _ref2$override === undefined ? false : _ref2$override;
+
 
 				if (override === true) {
 
@@ -976,6 +987,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					try {
 						for (var _iterator10 = this._viewsArray[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
 							var _view2 = _step10.value;
+
 
 							// Update enabled state of subviews (only updateClass if specifically enabled for recursive updates)
 							_view2._setEnabled(newState, {
@@ -1135,6 +1147,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					for (var _iterator11 = this._listeners[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
 						var listener = _step11.value;
 
+
 						listener.object.off(listener.eventName, listener.callback);
 					}
 
@@ -1161,6 +1174,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				try {
 					for (var _iterator12 = this._viewsArray[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
 						var _view3 = _step12.value;
+
 
 						_view3.deconstruct();
 					}
@@ -1216,6 +1230,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 						for (var _iterator13 = this.views.content[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
 							view = _step13.value;
+
 
 							view.owner = null;
 							view.remove().deconstruct();
@@ -1305,6 +1320,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					for (var _iterator14 = content[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
 						var object = _step14.value;
 
+
 						var c = this.content[this.indexForObject(object)];
 						newContent.push(c);
 						newContentViews.push(c.view);
@@ -1336,6 +1352,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				try {
 					for (var _iterator15 = this.views.content[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
 						var _view4 = _step15.value;
+
 
 						_view4.appendTo(this);
 					}
@@ -1401,11 +1418,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 					if (this.options.defaultChildClass) {
 
-						view = new this.options.defaultChildClass(null, null);
+						view = new this.options.defaultChildClass();
 						view.object = object;
 					} else {
 
-						view = new LRSGeneratedListItemView(null, {
+						view = new LRSGeneratedListItemView({
 							template: this.options.defaultChildTemplate
 						});
 						view.object = object;
@@ -1457,6 +1474,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		_createClass(LRSGeneratedListItemView, [{
 			key: "object",
 
+
 			// ### `property` object
 			set: function set(object) {
 
@@ -1469,6 +1487,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				try {
 					for (var _iterator16 = Object.keys(this.outlets)[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
 						var outletName = _step16.value;
+
 
 						var value = object[outletName];
 						if (value !== undefined) this[outletName] = value;
