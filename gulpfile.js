@@ -1,3 +1,5 @@
+'use strict';
+
 var gulp = require('gulp');
 
 var concat = require('gulp-concat')
@@ -10,23 +12,24 @@ var paths = {
 	js: ['src/*.js']
 }
 
-gulp.task('js', function() {
+function scripts() {
 	// Minify and copy all JavaScript (except vendor scripts)
 	return gulp.src(paths.js)
-		.pipe(iife())
 		.pipe(concat('lrs.js'))
+		.pipe(iife())
 		.pipe(babel({
 			presets: ['es2015']
 		}))
-		
-		.pipe(gulp.dest(''))
+		.pipe(gulp.dest('./'))
 		.pipe(uglify())
 		.pipe(rename({suffix: '.min'}))
-		.pipe(gulp.dest(''))
-})
+		.pipe(gulp.dest('./'))
+}
 
-gulp.task('watch', function() {
-	gulp.watch(paths.scripts, ['js'])
-})
+function watch() {
+	gulp.watch(paths.scripts, scripts)
+}
 
-gulp.task('default', ['js']);
+exports.watch = watch
+exports.scripts = scripts
+exports.default = scripts
