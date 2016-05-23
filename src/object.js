@@ -4,8 +4,6 @@ class LRSObject {
 	
 	constructor(options = {}) {
 		
-		if (!options) options = {}
-		
 		this.options = options
 		
 		this._events = {}
