@@ -41,7 +41,7 @@ class LRSView extends lrs.LRSObject {
 		
 	}
 
-	constructor(el, options) {
+	constructor({el, template, options} = {}) {
 		
 		super(options)
 		
@@ -50,10 +50,10 @@ class LRSView extends lrs.LRSObject {
 		this.delegateAction = this.delegateAction.bind(this)
 		
 		// Check to see if we need to load a template and whether we can.
-		if ((this.options.template || this.template) && (!el || el.children.length === 0)) {
+		if ((template || this.template) && (!el || el.children.length === 0)) {
 			
 			// Yes; load it.
-			this._loadTemplate()
+			this._loadTemplate(template || this.template)
 			
 			// Put it in the DOM if we are there already.
 			if (el && el.parentNode) {
@@ -90,10 +90,10 @@ class LRSView extends lrs.LRSObject {
 	
 	// ### `private` loadTemplate
 	// Create our el from the template defined in options.
-	_loadTemplate() {
+	_loadTemplate(template) {
 		
 		var el = document.createElement('div')
-		el.innerHTML = this.constructor.templates[(this.options.template || this.template)]
+		el.innerHTML = this.constructor.templates[template]
 		this.el = el.firstChild
 		
 		return this
@@ -124,7 +124,7 @@ class LRSView extends lrs.LRSObject {
 				
 				// Just one property, set name and create a generic view.
 				name = info[0]
-				view = new lrs.LRSView(viewEl, null)
+				view = new lrs.LRSView({el: viewEl})
 				
 			} else {
 				
@@ -152,7 +152,7 @@ class LRSView extends lrs.LRSObject {
 				}
 				
 				//Create view.
-				view = new this.constructor.views[info[0] + 'View'](viewEl, options)
+				view = new this.constructor.views[info[0] + 'View']({el: viewEl, options})
 				
 			}
 			
@@ -349,7 +349,7 @@ class LRSView extends lrs.LRSObject {
 				} else {
 					
 					// Otherwise, consider it a property name and return property value.
-					parameters.push(this[parameter])
+					parameters.push(this[parameter] || this.get(parameter))
 					
 				}
 				
@@ -933,12 +933,12 @@ class LRSListView extends LRSView {
 			
 			if (this.options.defaultChildClass) {
 				
-				view = new this.options.defaultChildClass(null, null)
+				view = new this.options.defaultChildClass()
 				view.object = object
 				
 			} else {
 				
-				view = new LRSGeneratedListItemView(null, {
+				view = new LRSGeneratedListItemView({
 					template: this.options.defaultChildTemplate
 				})
 				view.object = object
