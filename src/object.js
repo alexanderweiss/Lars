@@ -1,5 +1,3 @@
-'use strict';
-
 // ## LRSObject
 // Basic object class with get/set methods and events.
 class LRSObject {

@@ -1,5 +1,3 @@
-'use strict';
-
 // ## LRSView
 // View class. Provides outlets, actions, templates, nesting etc.
 class LRSView extends lrs.LRSObject {
