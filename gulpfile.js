@@ -32,7 +32,7 @@ function scripts() {
 }
 
 function watch() {
-	gulp.watch(paths.scripts, scripts)
+	gulp.watch(paths.js, scripts)
 }
 
 exports.watch = watch
