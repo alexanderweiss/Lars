@@ -13,144 +13,211 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 ;(function () {
 	"use strict";
 
-	// ## LRSObject
-	// Basic object class with get/set methods and events.
+	var lrs = window.lrs = {};
 
-	var LRSObject = function () {
-		function LRSObject() {
-			var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	var mix = function mix(superclass) {
+		return new MixinBuilder(superclass);
+	};
 
-			_classCallCheck(this, LRSObject);
+	var Base = function Base() {
+		_classCallCheck(this, Base);
+	};
 
-			this.options = options;
+	var MixinBuilder = function () {
+		function MixinBuilder(superclass) {
+			_classCallCheck(this, MixinBuilder);
 
-			this._events = {};
-
-			return this;
+			this.superclass = superclass || Base;
 		}
 
-		// ### on
-		// Add an event listener.
-
-
-		_createClass(LRSObject, [{
-			key: "on",
-			value: function on(eventName, handler) {
-
-				if (!eventName) throw new Error("Event name missing."); // TODO: Check type?
-				if (!handler) throw new Error("Event handler missing."); // TODO: Check type?
-
-				this._events[eventName] = this._events[eventName] || [];
-
-				if (this._events[eventName].indexOf(handler) === -1) {
-
-					this._events[eventName].push(handler);
+		_createClass(MixinBuilder, [{
+			key: "with",
+			value: function _with() {
+				for (var _len = arguments.length, mixins = Array(_len), _key = 0; _key < _len; _key++) {
+					mixins[_key] = arguments[_key];
 				}
 
-				return this;
-			}
-
-			// ### once
-			// Add an event listener that only fires once.
-
-		}, {
-			key: "once",
-			value: function once(eventName, handler) {
-
-				var _intermediateHandler = function intermediateHandler() {
-					this.off(eventName, _intermediateHandler);
-					handler.apply(this, arguments);
-				};
-
-				_intermediateHandler = _intermediateHandler.bind(this);
-				_intermediateHandler.handler = handler;
-
-				return this.on(event, _intermediateHandler);
-			}
-
-			// ### off
-			// Remove an event listener.
-
-		}, {
-			key: "off",
-			value: function off(eventName, handler) {
-
-				if (!eventName) throw new Error("Event name missing."); // TODO: Check type?
-				if (!handler) throw new Error("Event handler missing."); // TODO: Check type?
-
-				if (!this._events[eventName]) return this;
-
-				var index = -1;
-
-				for (var i in this._events[eventName]) {
-
-					if (this._events[eventName][i] === handler || this._events[eventName][i].handler === handler) {
-
-						index = i;
-						break;
-					}
-				}
-
-				this._events[eventName].splice(index, 1);
-
-				return this;
-			}
-
-			// ### trigger
-			// Trigger an event.
-
-		}, {
-			key: "trigger",
-			value: function trigger(eventName, args) {
-
-				if (!this._events[eventName]) return this;
-
-				var _iteratorNormalCompletion = true;
-				var _didIteratorError = false;
-				var _iteratorError = undefined;
-
-				try {
-					for (var _iterator = this._events[eventName].slice()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-						var handler = _step.value;
-
-
-						handler.apply(this, args);
-					}
-				} catch (err) {
-					_didIteratorError = true;
-					_iteratorError = err;
-				} finally {
-					try {
-						if (!_iteratorNormalCompletion && _iterator.return) {
-							_iterator.return();
-						}
-					} finally {
-						if (_didIteratorError) {
-							throw _iteratorError;
-						}
-					}
-				}
+				return mixins.reduce(function (c, mixin) {
+					return mixin(c);
+				}, this.superclass);
 			}
 		}]);
 
-		return LRSObject;
+		return MixinBuilder;
 	}();
 
-	window.lrs = window.lrs || {};
-	window.lrs.LRSObject = LRSObject;
-	// ## LRSView
+	var Events = function Events(superclass) {
+		return function (_superclass) {
+			_inherits(_class, _superclass);
+
+			function _class() {
+				_classCallCheck(this, _class);
+
+				var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(_class).call(this));
+
+				_this._events = {};
+
+				return _this;
+			}
+
+			// ### on
+			// Add an event listener.
+
+
+			_createClass(_class, [{
+				key: "on",
+				value: function on(eventName, handler) {
+
+					if (!eventName) throw new Error("Event name missing."); // TODO: Check type?
+					if (!handler) throw new Error("Event handler missing."); // TODO: Check type?
+
+					this._events[eventName] = this._events[eventName] || [];
+
+					if (this._events[eventName].indexOf(handler) === -1) {
+
+						this._events[eventName].push(handler);
+					}
+
+					return this;
+				}
+
+				// ### once
+				// Add an event listener that only fires once.
+
+			}, {
+				key: "once",
+				value: function once(eventName, handler) {
+
+					var _intermediateHandler = function intermediateHandler() {
+						this.off(eventName, _intermediateHandler);
+						handler.apply(this, arguments);
+					};
+
+					_intermediateHandler = _intermediateHandler.bind(this);
+					_intermediateHandler.handler = handler;
+
+					return this.on(event, _intermediateHandler);
+				}
+
+				// ### off
+				// Remove an event listener.
+
+			}, {
+				key: "off",
+				value: function off(eventName, handler) {
+
+					if (!eventName) throw new Error("Event name missing."); // TODO: Check type?
+					if (!handler) throw new Error("Event handler missing."); // TODO: Check type?
+
+					if (!this._events[eventName]) return this;
+
+					var index = -1;
+
+					for (var i in this._events[eventName]) {
+
+						if (this._events[eventName][i] === handler || this._events[eventName][i].handler === handler) {
+
+							index = i;
+							break;
+						}
+					}
+
+					this._events[eventName].splice(index, 1);
+
+					return this;
+				}
+
+				// ### trigger
+				// Trigger an event.
+
+			}, {
+				key: "trigger",
+				value: function trigger(eventName, args) {
+
+					if (!this._events[eventName]) return this;
+
+					var _iteratorNormalCompletion = true;
+					var _didIteratorError = false;
+					var _iteratorError = undefined;
+
+					try {
+						for (var _iterator = this._events[eventName].slice()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+							var handler = _step.value;
+
+
+							handler.apply(this, args);
+						}
+					} catch (err) {
+						_didIteratorError = true;
+						_iteratorError = err;
+					} finally {
+						try {
+							if (!_iteratorNormalCompletion && _iterator.return) {
+								_iterator.return();
+							}
+						} finally {
+							if (_didIteratorError) {
+								throw _iteratorError;
+							}
+						}
+					}
+
+					return this;
+				}
+			}]);
+
+			return _class;
+		}(superclass);
+	};
+
+	var LRSArray = function (_mix$with) {
+		_inherits(LRSArray, _mix$with);
+
+		function LRSArray() {
+			_classCallCheck(this, LRSArray);
+
+			return _possibleConstructorReturn(this, Object.getPrototypeOf(LRSArray).apply(this, arguments));
+		}
+
+		return LRSArray;
+	}(mix(Array).with(Events));
+
+	lrs.Array = LRSArray;
+	// ## Object
+	// Basic object class with get/set methods and events.
+
+	var LRSObject = function (_mix$with2) {
+		_inherits(LRSObject, _mix$with2);
+
+		function LRSObject() {
+			var _ret;
+
+			_classCallCheck(this, LRSObject);
+
+			var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(LRSObject).call(this));
+
+			_this3._events = {};
+
+			return _ret = _this3, _possibleConstructorReturn(_this3, _ret);
+		}
+
+		return LRSObject;
+	}(mix().with(Events));
+
+	lrs.Object = LRSObject;
+	lrs.LRSObject = LRSObject;
+	// ## View
 	// View class. Provides outlets, actions, templates, nesting etc.
 
-	var LRSView = function (_lrs$LRSObject) {
-		_inherits(LRSView, _lrs$LRSObject);
+	var View = function (_lrs$Object) {
+		_inherits(View, _lrs$Object);
 
-		_createClass(LRSView, null, [{
+		_createClass(View, null, [{
 			key: "parseTemplates",
 
 
 			// ### `static` parseTemplates
 			// Collect all templates from the document. Must be called once, before view initialisation.
-
 			value: function parseTemplates() {
 
 				if (this.templates) return;
@@ -224,10 +291,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					}
 				}
 			}
+
+			// ### `static` register
+			// Register a view.
+
+		}, {
+			key: "register",
+			value: function register(view) {
+
+				View.views[view.name.replace(/View$/g, '')] = view;
+			}
 		}]);
 
-		function LRSView() {
-			var _ret;
+		function View() {
+			var _ret2;
 
 			var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
@@ -235,39 +312,40 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			var template = _ref.template;
 			var options = _ref.options;
 
-			_classCallCheck(this, LRSView);
+			_classCallCheck(this, View);
 
-			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(LRSView).call(this, options));
+			var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(View).call(this));
 
-			_this._listeners = [];
+			_this4.options = options;
+			_this4._listeners = [];
 
-			_this.delegateAction = _this.delegateAction.bind(_this);
+			_this4.delegateAction = _this4.delegateAction.bind(_this4);
 
 			// Check to see if we need to load a template and whether we can.
-			if ((template || _this.template) && (!el || el.children.length === 0)) {
+			if ((template || _this4.template) && (!el || el.children.length === 0)) {
 
 				// Yes; load it.
-				_this._loadTemplate(template || _this.template);
+				_this4._loadTemplate(template || _this4.template);
 
 				// Put it in the DOM if we are there already.
 				if (el && el.parentNode) {
-					el.parentNode.replaceChild(_this.el, el);
+					el.parentNode.replaceChild(_this4.el, el);
 				}
 			} else {
 
 				// No; just set our el.
-				_this.el = el;
+				_this4.el = el;
 			}
 
-			_this.hidden = _this.el.classList.contains('hidden');
-			_this.enabled = !_this.el.classList.contains('disabled');
+			_this4.hidden = _this4.el.classList.contains('hidden');
+			_this4.enabled = !_this4.el.classList.contains('disabled');
 
-			if (!options || options.delayDomConnectionCreation !== true) _this.createDomConnections();
+			if (!options || options.delayDomConnectionCreation !== true) _this4.createDomConnections();
 
-			return _ret = _this, _possibleConstructorReturn(_this, _ret);
+			return _ret2 = _this4, _possibleConstructorReturn(_this4, _ret2);
 		}
 
-		_createClass(LRSView, [{
+		_createClass(View, [{
 			key: "createDomConnections",
 			value: function createDomConnections() {
 
@@ -329,7 +407,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 							// Just one property, set name and create a generic view.
 							name = info[0];
-							_view = new lrs.LRSView({ el: viewEl });
+							_view = new lrs.View({ el: viewEl });
 						} else {
 
 							// Multiple properties, set name and define options.
@@ -339,9 +417,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 							// Check if we have a template/subview options. If so, check if we have a corresponding view or template and set the relevant option.
 							if (info.length === 3) {
 
-								if (this.constructor.views[info[2] + 'View']) {
+								if (this.constructor.views[info[2]] || this.constructor.views[info[2] + 'View']) {
 
-									options.defaultChildClass = this.constructor.views[info[2] + 'View'];
+									options.defaultChildClass = this.constructor.views[info[2]] || this.constructor.views[info[2] + 'View'];
 								} else if (this.constructor.templates[info[2]]) {
 
 									options.defaultChildTemplate = info[2];
@@ -352,7 +430,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 							}
 
 							//Create view.
-							_view = new this.constructor.views[info[0] + 'View']({ el: viewEl, options: options });
+							_view = new (this.constructor.views[info[0]] || this.constructor.views[info[0] + 'View'])({ el: viewEl, options: options });
 						}
 
 						this.addView(_view, name);
@@ -840,7 +918,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				(viewOrEl.el || viewOrEl).appendChild(this.el);
 
 				// If view and name provided, add it to the view stack.
-				if (name && viewOrEl instanceof LRSView) return viewOrEl.addView(this, name);
+				if (name && viewOrEl instanceof View) return viewOrEl.addView(this, name);
 
 				return this;
 			}
@@ -857,7 +935,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				el.parentNode.insertBefore(this.el, el);
 
 				// If view and name provided, add it to the view stack.
-				if (name && viewOrEl instanceof LRSView && viewOrEl.owner) return viewOrEl.owner.addView(this, name);
+				if (name && viewOrEl instanceof View && viewOrEl.owner) return viewOrEl.owner.addView(this, name);
 
 				return this;
 			}
@@ -884,7 +962,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				}
 
 				// If view and name provided, add it to the view stack.
-				if (name && viewOrEl instanceof LRSView && viewOrEl.owner) return viewOrEl.owner.addView(this, name);
+				if (name && viewOrEl instanceof View && viewOrEl.owner) return viewOrEl.owner.addView(this, name);
 
 				return this;
 			}
@@ -1201,19 +1279,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			}
 		}]);
 
-		return LRSView;
-	}(lrs.LRSObject);
+		return View;
+	}(lrs.Object);
 
-	var LRSListView = function (_LRSView) {
-		_inherits(LRSListView, _LRSView);
+	var ListView = function (_View) {
+		_inherits(ListView, _View);
 
-		function LRSListView() {
-			_classCallCheck(this, LRSListView);
+		function ListView() {
+			_classCallCheck(this, ListView);
 
-			return _possibleConstructorReturn(this, Object.getPrototypeOf(LRSListView).apply(this, arguments));
+			return _possibleConstructorReturn(this, Object.getPrototypeOf(ListView).apply(this, arguments));
 		}
 
-		_createClass(LRSListView, [{
+		_createClass(ListView, [{
 			key: "reset",
 			value: function reset(content) {
 
@@ -1411,7 +1489,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				var view;
 
-				if (object instanceof LRSView) {
+				if (object instanceof View) {
 
 					view = object;
 				} else {
@@ -1422,7 +1500,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						view.object = object;
 					} else {
 
-						view = new LRSGeneratedListItemView({
+						view = new GeneratedListItemView({
 							template: this.options.defaultChildTemplate
 						});
 						view.object = object;
@@ -1447,31 +1525,31 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			}
 		}]);
 
-		return LRSListView;
-	}(LRSView);
+		return ListView;
+	}(View);
 
-	var LRSListItemView = function (_LRSView2) {
-		_inherits(LRSListItemView, _LRSView2);
+	var ListItemView = function (_View2) {
+		_inherits(ListItemView, _View2);
 
-		function LRSListItemView() {
-			_classCallCheck(this, LRSListItemView);
+		function ListItemView() {
+			_classCallCheck(this, ListItemView);
 
-			return _possibleConstructorReturn(this, Object.getPrototypeOf(LRSListItemView).apply(this, arguments));
+			return _possibleConstructorReturn(this, Object.getPrototypeOf(ListItemView).apply(this, arguments));
 		}
 
-		return LRSListItemView;
-	}(LRSView);
+		return ListItemView;
+	}(View);
 
-	var LRSGeneratedListItemView = function (_LRSListItemView) {
-		_inherits(LRSGeneratedListItemView, _LRSListItemView);
+	var GeneratedListItemView = function (_ListItemView) {
+		_inherits(GeneratedListItemView, _ListItemView);
 
-		function LRSGeneratedListItemView() {
-			_classCallCheck(this, LRSGeneratedListItemView);
+		function GeneratedListItemView() {
+			_classCallCheck(this, GeneratedListItemView);
 
-			return _possibleConstructorReturn(this, Object.getPrototypeOf(LRSGeneratedListItemView).apply(this, arguments));
+			return _possibleConstructorReturn(this, Object.getPrototypeOf(GeneratedListItemView).apply(this, arguments));
 		}
 
-		_createClass(LRSGeneratedListItemView, [{
+		_createClass(GeneratedListItemView, [{
 			key: "object",
 
 
@@ -1516,10 +1594,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			}
 		}]);
 
-		return LRSGeneratedListItemView;
-	}(LRSListItemView);
+		return GeneratedListItemView;
+	}(ListItemView);
 
-	LRSView.outletTypes = {
+	View.outletTypes = {
 		custom: {
 			get: function get(outlet, view) {
 				return outlet.get(view.el);
@@ -1562,17 +1640,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}
 	};
 
-	LRSView.outletTypes.default = LRSView.outletTypes.html;
-	LRSView.outletTypes.textarea = LRSView.outletTypes.input;
+	View.outletTypes.default = View.outletTypes.html;
+	View.outletTypes.textarea = View.outletTypes.input;
 
-	LRSView.views = {
-		LRSListView: LRSListView,
-		LRSListItemView: LRSListItemView,
-		LRSGeneratedListItemView: LRSGeneratedListItemView
+	View.views = {
+		LRSListView: ListView,
+		LRSListItemView: ListItemView,
+		LRSGeneratedListItemView: GeneratedListItemView
 	};
 
-	LRSView.isTouch = document.ontouchstart == null;
-	LRSView.actionStringPattern = /^(.*?):([A-Za-z0-9_-]*)(\((.*?)\))?$/;
+	View.register(ListView);
+	View.register(ListItemView);
+	View.register(GeneratedListItemView);
 
-	window.lrs.LRSView = LRSView;
+	View.isTouch = document.ontouchstart == null;
+	View.actionStringPattern = /^(.*?):([A-Za-z0-9_-]*)(\((.*?)\))?$/;
+
+	lrs.View = View;
+	lrs.views = View.views;
+	lrs.LRSView = View;
 })();
