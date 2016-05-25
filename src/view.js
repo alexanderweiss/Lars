@@ -1,6 +1,6 @@
-// ## LRSView
+// ## View
 // View class. Provides outlets, actions, templates, nesting etc.
-class LRSView extends lrs.LRSObject {
+class View extends lrs.Object {
 	
 	// ### `static` parseTemplates
 	// Collect all templates from the document. Must be called once, before view initialisation.
@@ -43,8 +43,9 @@ class LRSView extends lrs.LRSObject {
 
 	constructor({el, template, options} = {}) {
 		
-		super(options)
+		super()
 		
+		this.options = options
 		this._listeners = []
 		
 		this.delegateAction = this.delegateAction.bind(this)
@@ -124,7 +125,7 @@ class LRSView extends lrs.LRSObject {
 				
 				// Just one property, set name and create a generic view.
 				name = info[0]
-				view = new lrs.LRSView({el: viewEl})
+				view = new lrs.View({el: viewEl})
 				
 			} else {
 				
@@ -504,7 +505,7 @@ class LRSView extends lrs.LRSObject {
 		(viewOrEl.el || viewOrEl).appendChild(this.el)
 		
 		// If view and name provided, add it to the view stack.
-		if (name && viewOrEl instanceof LRSView) return viewOrEl.addView(this, name)
+		if (name && viewOrEl instanceof View) return viewOrEl.addView(this, name)
 		
 		return this
 		
@@ -519,7 +520,7 @@ class LRSView extends lrs.LRSObject {
 		el.parentNode.insertBefore(this.el, el)
 		
 		// If view and name provided, add it to the view stack.
-		if (name && viewOrEl instanceof LRSView && viewOrEl.owner) return viewOrEl.owner.addView(this, name)
+		if (name && viewOrEl instanceof View && viewOrEl.owner) return viewOrEl.owner.addView(this, name)
 		
 		return this
 		
@@ -546,7 +547,7 @@ class LRSView extends lrs.LRSObject {
 		}
 		
 		// If view and name provided, add it to the view stack.
-		if (name && viewOrEl instanceof LRSView && viewOrEl.owner) return viewOrEl.owner.addView(this, name)
+		if (name && viewOrEl instanceof View && viewOrEl.owner) return viewOrEl.owner.addView(this, name)
 		
 		return this
 		
@@ -779,7 +780,7 @@ class LRSView extends lrs.LRSObject {
 	
 }
 
-class LRSListView extends LRSView {
+class ListView extends View {
 	
 	reset(content) {
 		
@@ -925,7 +926,7 @@ class LRSListView extends LRSView {
 		
 		var view
 		
-		if (object instanceof LRSView) {
+		if (object instanceof View) {
 			
 			view = object
 			
@@ -938,7 +939,7 @@ class LRSListView extends LRSView {
 				
 			} else {
 				
-				view = new LRSGeneratedListItemView({
+				view = new GeneratedListItemView({
 					template: this.options.defaultChildTemplate
 				})
 				view.object = object
@@ -969,9 +970,9 @@ class LRSListView extends LRSView {
 	
 }
 
-class LRSListItemView extends LRSView {}
+class ListItemView extends View {}
 
-class LRSGeneratedListItemView extends LRSListItemView {
+class GeneratedListItemView extends ListItemView {
 	
 	// ### `property` object
 	set object(object) {
@@ -996,7 +997,7 @@ class LRSGeneratedListItemView extends LRSListItemView {
 	
 }
 
-LRSView.outletTypes = {
+View.outletTypes = {
 	custom: {
 		get: function(outlet, view) {
 			return outlet.get(view.el)
@@ -1039,16 +1040,20 @@ LRSView.outletTypes = {
 	}
 }
 
-LRSView.outletTypes.default = LRSView.outletTypes.html
-LRSView.outletTypes.textarea = LRSView.outletTypes.input
+View.outletTypes.default = View.outletTypes.html
+View.outletTypes.textarea = View.outletTypes.input
 
-LRSView.views = {
-	LRSListView,
-	LRSListItemView,
-	LRSGeneratedListItemView
+View.views = {
+	ListView,
+	ListItemView,
+	GeneratedListItemView,
+	LRSListView: ListView,
+	LRSListItemView: ListItemView,
+	LRSGeneratedListItemView: GeneratedListItemView
 }
 
-LRSView.isTouch = document.ontouchstart == null
-LRSView.actionStringPattern = /^(.*?):([A-Za-z0-9_-]*)(\((.*?)\))?$/
+View.isTouch = document.ontouchstart == null
+View.actionStringPattern = /^(.*?):([A-Za-z0-9_-]*)(\((.*?)\))?$/
 
-window.lrs.LRSView = LRSView
+lrs.View = View
+lrs.LRSView = View
