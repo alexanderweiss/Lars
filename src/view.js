@@ -4,7 +4,6 @@ class View extends lrs.Object {
 	
 	// ### `static` parseTemplates
 	// Collect all templates from the document. Must be called once, before view initialisation.
-	
 	static parseTemplates() {
 		
 		if (this.templates) return
@@ -38,6 +37,14 @@ class View extends lrs.Object {
 			
 			
 		}
+		
+	}
+	
+	// ### `static` register
+	// Register a view.
+	static register(view) {
+		
+		View.views[view.name.replace(/View$/g, '')] = view
 		
 	}
 
@@ -136,9 +143,9 @@ class View extends lrs.Object {
 				// Check if we have a template/subview options. If so, check if we have a corresponding view or template and set the relevant option.
 				if (info.length === 3) {
 					
-					if (this.constructor.views[info[2] + 'View']) {
+					if (this.constructor.views[info[2]] || this.constructor.views[info[2] + 'View']) {
 						
-						options.defaultChildClass = this.constructor.views[info[2] + 'View']
+						options.defaultChildClass = this.constructor.views[info[2]] || this.constructor.views[info[2] + 'View']
 						
 					} else if (this.constructor.templates[info[2]]) {
 						
@@ -153,7 +160,7 @@ class View extends lrs.Object {
 				}
 				
 				//Create view.
-				view = new this.constructor.views[info[0] + 'View']({el: viewEl, options})
+				view = new (this.constructor.views[info[0]] || this.constructor.views[info[0] + 'View'])({el: viewEl, options})
 				
 			}
 			
@@ -1044,16 +1051,18 @@ View.outletTypes.default = View.outletTypes.html
 View.outletTypes.textarea = View.outletTypes.input
 
 View.views = {
-	ListView,
-	ListItemView,
-	GeneratedListItemView,
 	LRSListView: ListView,
 	LRSListItemView: ListItemView,
 	LRSGeneratedListItemView: GeneratedListItemView
 }
 
+View.register(ListView)
+View.register(ListItemView)
+View.register(GeneratedListItemView)
+
 View.isTouch = document.ontouchstart == null
 View.actionStringPattern = /^(.*?):([A-Za-z0-9_-]*)(\((.*?)\))?$/
 
 lrs.View = View
+lrs.views = View.views
 lrs.LRSView = View
