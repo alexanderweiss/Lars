@@ -20,7 +20,12 @@ let Events = (superclass) => class extends superclass {
 		
 		super()
 		
-		this._events = {}
+		Object.defineProperty(this, '_events', {
+			value: {},
+			configurable: false,
+			enumerable: false,
+			writable: false
+		})
 		
 	}
 	
