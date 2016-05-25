@@ -24,7 +24,7 @@ LRSArray.proxyHandler = {
 					if (this.setAction.changes.length) this.setAction.changes.length.old = this.setAction.oldLength
 					if (this.setAction.changes.length.old == this.setAction.changes.length.new) delete this.setAction.changes.length
 					
-					target.trigger('change', [this.setAction.changes])
+					target.trigger('change', [this.setAction.changes, target])
 					
 					this.setAction = null
 					
@@ -51,7 +51,7 @@ LRSArray.proxyHandler = {
 					
 					this.deleteAction.changes.length = { new: target.length, old: this.deleteAction.oldLength }
 					
-					target.trigger('change', [this.deleteAction.changes])
+					target.trigger('change', [this.deleteAction.changes, target])
 					
 					this.deleteAction = null
 					
