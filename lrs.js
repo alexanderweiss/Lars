@@ -55,7 +55,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(_class).call(this));
 
-				_this._events = {};
+				Object.defineProperty(_this, '_events', {
+					value: {},
+					configurable: false,
+					enumerable: false,
+					writable: false
+				});
 
 				return _this;
 			}
@@ -169,36 +174,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			return _class;
 		}(superclass);
 	};
-
-	var LRSArray = function (_mix$with) {
-		_inherits(LRSArray, _mix$with);
-
-		function LRSArray() {
-			_classCallCheck(this, LRSArray);
-
-			return _possibleConstructorReturn(this, Object.getPrototypeOf(LRSArray).apply(this, arguments));
-		}
-
-		return LRSArray;
-	}(mix(Array).with(Events));
-
-	lrs.Array = LRSArray;
 	// ## Object
 	// Basic object class with get/set methods and events.
 
-	var LRSObject = function (_mix$with2) {
-		_inherits(LRSObject, _mix$with2);
+	var LRSObject = function (_mix$with) {
+		_inherits(LRSObject, _mix$with);
 
 		function LRSObject() {
-			var _ret;
-
 			_classCallCheck(this, LRSObject);
 
-			var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(LRSObject).call(this));
-
-			_this3._events = {};
-
-			return _ret = _this3, _possibleConstructorReturn(_this3, _ret);
+			return _possibleConstructorReturn(this, Object.getPrototypeOf(LRSObject).apply(this, arguments));
 		}
 
 		return LRSObject;
@@ -304,7 +289,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}]);
 
 		function View() {
-			var _ret2;
+			var _ret;
 
 			var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
@@ -314,35 +299,35 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 			_classCallCheck(this, View);
 
-			var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(View).call(this));
+			var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(View).call(this));
 
-			_this4.options = options;
-			_this4._listeners = [];
+			_this3.options = options;
+			_this3._listeners = [];
 
-			_this4.delegateAction = _this4.delegateAction.bind(_this4);
+			_this3.delegateAction = _this3.delegateAction.bind(_this3);
 
 			// Check to see if we need to load a template and whether we can.
-			if ((template || _this4.template) && (!el || el.children.length === 0)) {
+			if ((template || _this3.template) && (!el || el.children.length === 0)) {
 
 				// Yes; load it.
-				_this4._loadTemplate(template || _this4.template);
+				_this3._loadTemplate(template || _this3.template);
 
 				// Put it in the DOM if we are there already.
 				if (el && el.parentNode) {
-					el.parentNode.replaceChild(_this4.el, el);
+					el.parentNode.replaceChild(_this3.el, el);
 				}
 			} else {
 
 				// No; just set our el.
-				_this4.el = el;
+				_this3.el = el;
 			}
 
-			_this4.hidden = _this4.el.classList.contains('hidden');
-			_this4.enabled = !_this4.el.classList.contains('disabled');
+			_this3.hidden = _this3.el.classList.contains('hidden');
+			_this3.enabled = !_this3.el.classList.contains('disabled');
 
-			if (!options || options.delayDomConnectionCreation !== true) _this4.createDomConnections();
+			if (!options || options.delayDomConnectionCreation !== true) _this3.createDomConnections();
 
-			return _ret2 = _this4, _possibleConstructorReturn(_this4, _ret2);
+			return _ret = _this3, _possibleConstructorReturn(_this3, _ret);
 		}
 
 		_createClass(View, [{
