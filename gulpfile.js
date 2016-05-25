@@ -22,12 +22,6 @@ function scripts() {
 		]))
 		.pipe(concat('lrs.js'))
 		.pipe(iife())
-		.pipe(babel({
-			presets: ['es2015']
-		}))
-		.pipe(gulp.dest('./'))
-		.pipe(uglify())
-		.pipe(rename({suffix: '.min'}))
 		.pipe(gulp.dest('./'))
 }
 
