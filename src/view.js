@@ -1,6 +1,6 @@
 // ## View
 // View class. Provides outlets, actions, templates, nesting etc.
-class View extends lrs.Object {
+class View extends mix().with(Events) {
 	
 	// ### `static` parseTemplates
 	// Collect all templates from the document. Must be called once, before view initialisation.
