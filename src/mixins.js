@@ -16,9 +16,9 @@ class MixinBuilder {
 
 let Events = (superclass) => class extends superclass {
 	
-	constructor() {
+	constructor(...args) {
 		
-		super()
+		super(...args)
 		
 		Object.defineProperty(this, '_events', {
 			value: {},
@@ -26,6 +26,8 @@ let Events = (superclass) => class extends superclass {
 			enumerable: false,
 			writable: false
 		})
+		
+		return this
 		
 	}
 	
