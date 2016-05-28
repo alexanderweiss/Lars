@@ -1,10 +1,124 @@
 class LRSArray extends mix(Array).with(Events) {
 	
-	constructor() {
+	constructor(...args) {
 		
-		super()
+		super(...args)
+		
+		Object.defineProperty(this, '_track', {
+			value: true,
+			configurable: false,
+			enumerable: false,
+			writable: true
+		})
 		
 		return new Proxy(this, this.constructor.proxyHandler)
+		
+	}
+	
+	// copyWithin() {} Changes existing elements, so we'll have the proxy handle it.
+	
+	// fill() { } Changes existing elements, so we'll have the proxy handle it.
+	
+	pop() {
+		
+		var result = this._untrack(super.pop)
+		
+		this.trigger('remove', [result, this.length, this])
+		
+		return result
+		
+	}
+	
+	push(...elements) {
+		
+		var i = this.length
+		
+		var result = this._untrack(super.push, elements)
+		
+		for (let element of elements) {
+			this.trigger('add', [element, i, this])
+			i++
+		}
+		
+		return result
+		
+	}
+	
+	reverse() {
+		
+		var result = this._untrack(super.reverse)
+		
+		this.trigger('sort', [this])
+		
+		return result
+		
+	}
+	
+	shift() {
+		
+		var result = this._untrack(super.shift)
+		
+		this.trigger('remove', [result, 0, this])
+		
+		return result
+		
+	}
+	
+	sort(fn) {
+		
+		var result = this._untrack(super.sort, [fn])
+		
+		this.trigger('sort', [this])		
+		
+		return result
+		
+	}
+	
+	splice(start, deleteCount, ...elements) {
+		
+		var index = start >= 0 ? (start > this.length ? this.length : start ) : this.length + start
+		var i
+		
+		var result = this._untrack(super.shift, [start, deleteCount, elements])
+		
+		i = index
+		for (let element of result) {
+			this.trigger('remove', [element, i, this])
+			i++
+		}
+		
+		i = index
+		for (let element of element) {
+			this.trigger('add', [element, i, this])
+			i++
+		}
+		
+		return result
+		
+	}
+	
+	unshift(...elements) {
+		
+		var result = this._untrack(super.unshift, elements)
+		
+		var i = 0
+		
+		for (let element of elements) {
+			this.trigger('add', [element, i, this])
+			i++
+		}
+		
+		return result
+		
+	}
+	
+	_untrack(fn, args = []) {
+		
+		this._track = false
+		var result = fn.apply(this, args)
+		this._track = true
+		
+		return result
 		
 	}
 	
@@ -14,53 +128,48 @@ LRSArray.proxyHandler = {
 	
 	set: function(target, property, value, receiver) {
 		
-		if (!this.setAction) {
+		if (target._track == true && target[property] !== value) {
 			
-			this.setAction = {
-				changes: {},
-				oldLength: target.length,
-				timeout: setTimeout(() => {
+			if (property != 'length' && property != '_track') {
+				
+				// TODO: Set value first.
+				if (property < target.length) {
 					
-					if (this.setAction.changes.length) this.setAction.changes.length.old = this.setAction.oldLength
-					if (this.setAction.changes.length.old == this.setAction.changes.length.new) delete this.setAction.changes.length
+					target.trigger('change', [value, property, this])
 					
-					target.trigger('change', [this.setAction.changes, target])
+				} else {
 					
-					this.setAction = null
+					target.trigger('add', [value, property, this])
 					
-				}, 0)
+				}
+				
 			}
 			
 		}
 		
-		this.setAction.changes[property] = {new: value, old: target[property]}
-		
-		target[property] = value
+		Reflect.set(...arguments)
 		
 		return true
 	},
 	
 	deleteProperty: function(target, property) {
 		
-		if (!this.deleteAction) {
+		if (target._track == true) {
 			
-			this.deleteAction = {
-				changes: {},
-				oldLength: target.length,
-				timeout: setTimeout(() => {
+			if (property != 'length' && property != '_track') {
+				
+				// TODO: Set value first.
+				if (property < target.length) {
 					
-					this.deleteAction.changes.length = { new: target.length, old: this.deleteAction.oldLength }
+					target.trigger('remove', [target[property], property, this])
 					
-					target.trigger('change', [this.deleteAction.changes, target])
-					
-					this.deleteAction = null
-					
-				}, 0)
+				}
+				
 			}
 			
 		}
 		
-		this.deleteAction.changes[property] = {new: undefined, old: target[property]}
+		Reflect.delete(...arguments)
 		
 		return true
 	}
