@@ -10,9 +10,24 @@
 				
 			</div>
 			
+			<div data-view="Test:test" class="hi" data-test3 data-test1="changed"></div>
+			
 		</div>
+		<script type="text/html" class="templates">
+			<span class="test1 test2" data-test1="a" data-test2 data-template="test"></span>
+		</script>
 		<script src="lrs.js"></script>
 		<script>
+			
+			class TestView extends lrs.View {
+				
+				get template() { return 'test' }
+				
+			}
+			
+			lrs.View.register(TestView)
+			
+			lrs.View.parseTemplates()
 			
 			var app = new lrs.LRSView({el: document.querySelector('.app')})
 			

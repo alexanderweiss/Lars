@@ -61,7 +61,7 @@ class View extends lrs.Object {
 		if ((template || this.template) && (!el || el.children.length === 0)) {
 			
 			// Yes; load it.
-			this._loadTemplate(template || this.template)
+			this._loadTemplate(template || this.template, el)
 			
 			// Put it in the DOM if we are there already.
 			if (el && el.parentNode) {
@@ -98,10 +98,22 @@ class View extends lrs.Object {
 	
 	// ### `private` loadTemplate
 	// Create our el from the template defined in options.
-	_loadTemplate(template) {
+	_loadTemplate(template, definitionEl) {
 		
 		var el = document.createElement('div')
 		el.innerHTML = this.constructor.templates[template]
+		
+		// Copy classes and data attributes.
+		if (definitionEl) {
+			
+			el.firstChild.classList.add(...Array.from(definitionEl.classList))
+			for (let key of Object.keys(definitionEl.dataset)) {
+				el.firstChild.dataset[key] = definitionEl.dataset[key]
+			}
+			
+		}
+		
+		
 		this.el = el.firstChild
 		
 		return this
