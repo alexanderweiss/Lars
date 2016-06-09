@@ -911,7 +911,7 @@ class ListView extends View {
 	
 	indexForObject(object) {
 		
-		for (let i = 0; i < this.content; i++) {
+		for (let i = 0; i < this.content.length; i++) {
 			
 			if (this.content[i].object === object) return i
 			
@@ -923,7 +923,7 @@ class ListView extends View {
 	
 	indexForView(view) {
 		
-		for (let i = 0; i < this.content; i++) {
+		for (let i = 0; i < this.content.length; i++) {
 			
 			if (this.content[i].view === view) return i
 			
