@@ -813,10 +813,9 @@ class ListView extends View {
 		
 		if (this.views.content.length) {
 			
-			for (view of this.views.content) {
+			for (let view of this.views.content) {
 				
-				view.owner = null
-				view.remove().deconstruct()
+				this._removeContentView(view)
 				
 			}
 			
@@ -868,16 +867,26 @@ class ListView extends View {
 	remove(object) {
 		
 		var i = this.indexForObject(object)
+		var view = this.views.content[i]
 		
 		if (i < 0) return this //TODO: Throw error?
 		
 		this.content.splice(i, 1)
-		
-		this.views.content[i].owner = null
-		this.views.content[i].remove().deinitilize()
 		this.views.content.splice(i, 1)
+		this._removeContentView(view)
+		
 		
 		return this
+		
+	}
+	
+	_removeContentView(view) {
+		
+		this._viewsArray.splice(this._viewsArray.indexOf(view))
+		
+		view.remove(false)
+		view.owner = null
+		view.deconstruct()
 		
 	}
 	
@@ -972,7 +981,9 @@ class ListView extends View {
 		}
 		
 		if (view.owner) throw new Error('View is already owned by a view')
+		view._name = 'content'
 		view.owner = this
+		this._viewsArray.push(view)
 		
 		if (i === this.views.content.length) {
 			

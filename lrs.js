@@ -4,6 +4,8 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
@@ -13,15 +15,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 ;(function () {
 	"use strict";
 
+	// Setup lrs variable.
+
 	var lrs = window.lrs = {};
 
-	var mix = function mix(superclass) {
-		return new MixinBuilder(superclass);
-	};
+	// ## Base
+	// Base class to extend from. Currently adds no functionality, except allowing classes that don't extend another class to use mixins.
 
 	var Base = function Base() {
 		_classCallCheck(this, Base);
 	};
+
+	// ## MixinBuilder
+	// Class to extend a superclass with mixins.
+
 
 	var MixinBuilder = function () {
 		function MixinBuilder(superclass) {
@@ -30,6 +37,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			this.superclass = superclass || Base;
 		}
 
+		// ### with
+		// # Return superclass extended with mixins.
+
+
 		_createClass(MixinBuilder, [{
 			key: "with",
 			value: function _with() {
@@ -37,6 +48,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					mixins[_key] = arguments[_key];
 				}
 
+				// Extend each mixin with the next, starting from the superclass.
 				return mixins.reduce(function (c, mixin) {
 					return mixin(c);
 				}, this.superclass);
@@ -46,6 +58,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		return MixinBuilder;
 	}();
 
+	// Make MixinBuilder available as function mix, allowing `mix(superclass).with(mixin1, mixin2, ...)` syntax.
+
+
+	var mix = function mix(superclass) {
+		return new MixinBuilder(superclass);
+	};
+
+	// ## Events
+	// Mixin to support class/object events.
 	var Events = function Events(superclass) {
 		return function (_superclass) {
 			_inherits(_class, _superclass);
@@ -53,7 +74,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			function _class() {
 				_classCallCheck(this, _class);
 
-				var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(_class).call(this));
+				var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(_class).apply(this, arguments));
 
 				Object.defineProperty(_this, '_events', {
 					value: {},
@@ -194,8 +215,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	// ## View
 	// View class. Provides outlets, actions, templates, nesting etc.
 
-	var View = function (_lrs$Object) {
-		_inherits(View, _lrs$Object);
+	var View = function (_mix$with2) {
+		_inherits(View, _mix$with2);
 
 		_createClass(View, null, [{
 			key: "parseTemplates",
@@ -310,7 +331,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			if ((template || _this3.template) && (!el || el.children.length === 0)) {
 
 				// Yes; load it.
-				_this3._loadTemplate(template || _this3.template);
+				_this3._loadTemplate(template || _this3.template, el);
 
 				// Put it in the DOM if we are there already.
 				if (el && el.parentNode) {
@@ -330,6 +351,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			return _ret = _this3, _possibleConstructorReturn(_this3, _ret);
 		}
 
+		// ### createDomConnections
+		// Create all connections to the dom, including subviews, outlets and actions. Will normally be run during construction, but may be delayed through an option.
+
+
 		_createClass(View, [{
 			key: "createDomConnections",
 			value: function createDomConnections() {
@@ -348,10 +373,42 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 		}, {
 			key: "_loadTemplate",
-			value: function _loadTemplate(template) {
+			value: function _loadTemplate(template, definitionEl) {
 
 				var el = document.createElement('div');
 				el.innerHTML = this.constructor.templates[template];
+
+				// Copy classes and data attributes.
+				if (definitionEl) {
+					var _el$firstChild$classL;
+
+					(_el$firstChild$classL = el.firstChild.classList).add.apply(_el$firstChild$classL, _toConsumableArray(Array.from(definitionEl.classList)));
+					var _iteratorNormalCompletion4 = true;
+					var _didIteratorError4 = false;
+					var _iteratorError4 = undefined;
+
+					try {
+						for (var _iterator4 = Object.keys(definitionEl.dataset)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+							var key = _step4.value;
+
+							el.firstChild.dataset[key] = definitionEl.dataset[key];
+						}
+					} catch (err) {
+						_didIteratorError4 = true;
+						_iteratorError4 = err;
+					} finally {
+						try {
+							if (!_iteratorNormalCompletion4 && _iterator4.return) {
+								_iterator4.return();
+							}
+						} finally {
+							if (_didIteratorError4) {
+								throw _iteratorError4;
+							}
+						}
+					}
+				}
+
 				this.el = el.firstChild;
 
 				return this;
@@ -368,13 +425,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				this._viewsArray = [];
 
 				// Iterate over all elements that should be views.
-				var _iteratorNormalCompletion4 = true;
-				var _didIteratorError4 = false;
-				var _iteratorError4 = undefined;
+				var _iteratorNormalCompletion5 = true;
+				var _didIteratorError5 = false;
+				var _iteratorError5 = undefined;
 
 				try {
-					for (var _iterator4 = Array.from(this.el.querySelectorAll('[data-view]'))[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-						var viewEl = _step4.value;
+					for (var _iterator5 = Array.from(this.el.querySelectorAll('[data-view]'))[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+						var viewEl = _step5.value;
 
 
 						// Skip the element if it has already been processed (prevents nested views from being reprocessed at the wrong level).
@@ -385,14 +442,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						viewEl.removeAttribute('data-view');
 
 						var name = void 0,
-						    _view = void 0;
+						    view = void 0;
 
 						// Check definition type.
 						if (info.length === 1) {
 
 							// Just one property, set name and create a generic view.
 							name = info[0];
-							_view = new lrs.View({ el: viewEl });
+							view = new lrs.View({ el: viewEl });
 						} else {
 
 							// Multiple properties, set name and define options.
@@ -415,22 +472,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 							}
 
 							//Create view.
-							_view = new (this.constructor.views[info[0]] || this.constructor.views[info[0] + 'View'])({ el: viewEl, options: options });
+							view = new (this.constructor.views[info[0]] || this.constructor.views[info[0] + 'View'])({ el: viewEl, options: options });
 						}
 
-						this.addView(_view, name);
+						this.addView(view, name);
 					}
 				} catch (err) {
-					_didIteratorError4 = true;
-					_iteratorError4 = err;
+					_didIteratorError5 = true;
+					_iteratorError5 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion4 && _iterator4.return) {
-							_iterator4.return();
+						if (!_iteratorNormalCompletion5 && _iterator5.return) {
+							_iterator5.return();
 						}
 					} finally {
-						if (_didIteratorError4) {
-							throw _iteratorError4;
+						if (_didIteratorError5) {
+							throw _iteratorError5;
 						}
 					}
 				}
@@ -451,13 +508,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (this.el.hasAttribute('data-outlet')) this._createOutlet(this.el);
 
 				// Iterate over all elements that should be outlets.
-				var _iteratorNormalCompletion5 = true;
-				var _didIteratorError5 = false;
-				var _iteratorError5 = undefined;
+				var _iteratorNormalCompletion6 = true;
+				var _didIteratorError6 = false;
+				var _iteratorError6 = undefined;
 
 				try {
-					for (var _iterator5 = Array.from(this.el.querySelectorAll('[data-outlet]'))[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-						var outletEl = _step5.value;
+					for (var _iterator6 = Array.from(this.el.querySelectorAll('[data-outlet]'))[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+						var outletEl = _step6.value;
 
 
 						// Create an outlet.
@@ -466,16 +523,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 					// Are any custom outlets defined?
 				} catch (err) {
-					_didIteratorError5 = true;
-					_iteratorError5 = err;
+					_didIteratorError6 = true;
+					_iteratorError6 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion5 && _iterator5.return) {
-							_iterator5.return();
+						if (!_iteratorNormalCompletion6 && _iterator6.return) {
+							_iterator6.return();
 						}
 					} finally {
-						if (_didIteratorError5) {
-							throw _iteratorError5;
+						if (_didIteratorError6) {
+							throw _iteratorError6;
 						}
 					}
 				}
@@ -483,13 +540,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (this.customOutlets) {
 
 					// Yes; iterate over them.
-					var _iteratorNormalCompletion6 = true;
-					var _didIteratorError6 = false;
-					var _iteratorError6 = undefined;
+					var _iteratorNormalCompletion7 = true;
+					var _didIteratorError7 = false;
+					var _iteratorError7 = undefined;
 
 					try {
-						for (var _iterator6 = Object.keys(this.customOutlets)[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-							var customOutletName = _step6.value;
+						for (var _iterator7 = Object.keys(this.customOutlets)[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+							var customOutletName = _step7.value;
 
 
 							// Add them to our outlets and define their type.
@@ -497,16 +554,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 							this.outlets[customOutletName].type = 'custom';
 						}
 					} catch (err) {
-						_didIteratorError6 = true;
-						_iteratorError6 = err;
+						_didIteratorError7 = true;
+						_iteratorError7 = err;
 					} finally {
 						try {
-							if (!_iteratorNormalCompletion6 && _iterator6.return) {
-								_iterator6.return();
+							if (!_iteratorNormalCompletion7 && _iterator7.return) {
+								_iterator7.return();
 							}
 						} finally {
-							if (_didIteratorError6) {
-								throw _iteratorError6;
+							if (_didIteratorError7) {
+								throw _iteratorError7;
 							}
 						}
 					}
@@ -577,29 +634,29 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (this.el.hasAttribute('data-action')) this._createAction(this.el);
 
 				// Iterate over all elements that should be outlets.
-				var _iteratorNormalCompletion7 = true;
-				var _didIteratorError7 = false;
-				var _iteratorError7 = undefined;
+				var _iteratorNormalCompletion8 = true;
+				var _didIteratorError8 = false;
+				var _iteratorError8 = undefined;
 
 				try {
-					for (var _iterator7 = Array.from(this.el.querySelectorAll('[data-action]'))[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-						var actionEl = _step7.value;
+					for (var _iterator8 = Array.from(this.el.querySelectorAll('[data-action]'))[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+						var actionEl = _step8.value;
 
 
 						// Create an outlet.
 						this._createAction(actionEl);
 					}
 				} catch (err) {
-					_didIteratorError7 = true;
-					_iteratorError7 = err;
+					_didIteratorError8 = true;
+					_iteratorError8 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion7 && _iterator7.return) {
-							_iterator7.return();
+						if (!_iteratorNormalCompletion8 && _iterator8.return) {
+							_iterator8.return();
 						}
 					} finally {
-						if (_didIteratorError7) {
-							throw _iteratorError7;
+						if (_didIteratorError8) {
+							throw _iteratorError8;
 						}
 					}
 				}
@@ -623,13 +680,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				el.removeAttribute('data-action');
 
 				// Iterate over all the seperated action strings.
-				var _iteratorNormalCompletion8 = true;
-				var _didIteratorError8 = false;
-				var _iteratorError8 = undefined;
+				var _iteratorNormalCompletion9 = true;
+				var _didIteratorError9 = false;
+				var _iteratorError9 = undefined;
 
 				try {
-					for (var _iterator8 = actionStrings[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-						var actionString = _step8.value;
+					for (var _iterator9 = actionStrings[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+						var actionString = _step9.value;
 
 
 						// Parse.
@@ -658,16 +715,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						});
 					}
 				} catch (err) {
-					_didIteratorError8 = true;
-					_iteratorError8 = err;
+					_didIteratorError9 = true;
+					_iteratorError9 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion8 && _iterator8.return) {
-							_iterator8.return();
+						if (!_iteratorNormalCompletion9 && _iterator9.return) {
+							_iterator9.return();
 						}
 					} finally {
-						if (_didIteratorError8) {
-							throw _iteratorError8;
+						if (_didIteratorError9) {
+							throw _iteratorError9;
 						}
 					}
 				}
@@ -692,13 +749,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (!actions) return;
 
 				// Iterate over all actions.
-				var _iteratorNormalCompletion9 = true;
-				var _didIteratorError9 = false;
-				var _iteratorError9 = undefined;
+				var _iteratorNormalCompletion10 = true;
+				var _didIteratorError10 = false;
+				var _iteratorError10 = undefined;
 
 				try {
-					for (var _iterator9 = actions[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-						var action = _step9.value;
+					for (var _iterator10 = actions[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+						var action = _step10.value;
 
 
 						// Check if the action belongs to the element that we are delegating for.
@@ -740,16 +797,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						this.dispatch(action.name + 'Action', parameters);
 					}
 				} catch (err) {
-					_didIteratorError9 = true;
-					_iteratorError9 = err;
+					_didIteratorError10 = true;
+					_iteratorError10 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion9 && _iterator9.return) {
-							_iterator9.return();
+						if (!_iteratorNormalCompletion10 && _iterator10.return) {
+							_iterator10.return();
 						}
 					} finally {
-						if (_didIteratorError9) {
-							throw _iteratorError9;
+						if (_didIteratorError10) {
+							throw _iteratorError10;
 						}
 					}
 				}
@@ -822,7 +879,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			}
 
 			// ### addView
-			// Add a view within to this view.
+			// Add a view within this view.
 
 		}, {
 			key: "addView",
@@ -888,6 +945,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					// No; remove key.
 					delete this.views[view.name];
 				}
+
+				view.owner = null;
 
 				return this;
 			}
@@ -1043,17 +1102,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (recursive === true) {
 
 					// No; go over all subviews.
-					var _iteratorNormalCompletion10 = true;
-					var _didIteratorError10 = false;
-					var _iteratorError10 = undefined;
+					var _iteratorNormalCompletion11 = true;
+					var _didIteratorError11 = false;
+					var _iteratorError11 = undefined;
 
 					try {
-						for (var _iterator10 = this._viewsArray[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
-							var _view2 = _step10.value;
+						for (var _iterator11 = this._viewsArray[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+							var view = _step11.value;
 
 
 							// Update enabled state of subviews (only updateClass if specifically enabled for recursive updates)
-							_view2._setEnabled(newState, {
+							view._setEnabled(newState, {
 								recursive: true,
 								updateClass: updateClass && updateClassRecursive === true,
 								updateClassRecursive: updateClassRecursive,
@@ -1061,16 +1120,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 							});
 						}
 					} catch (err) {
-						_didIteratorError10 = true;
-						_iteratorError10 = err;
+						_didIteratorError11 = true;
+						_iteratorError11 = err;
 					} finally {
 						try {
-							if (!_iteratorNormalCompletion10 && _iterator10.return) {
-								_iterator10.return();
+							if (!_iteratorNormalCompletion11 && _iterator11.return) {
+								_iterator11.return();
 							}
 						} finally {
-							if (_didIteratorError10) {
-								throw _iteratorError10;
+							if (_didIteratorError11) {
+								throw _iteratorError11;
 							}
 						}
 					}
@@ -1202,45 +1261,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (this.owner) throw new Error('View may not be in view stack. Call remove() first.');
 
 				// Go over all registered listeners and stop listening.
-				var _iteratorNormalCompletion11 = true;
-				var _didIteratorError11 = false;
-				var _iteratorError11 = undefined;
+				var _iteratorNormalCompletion12 = true;
+				var _didIteratorError12 = false;
+				var _iteratorError12 = undefined;
 
 				try {
-					for (var _iterator11 = this._listeners[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
-						var listener = _step11.value;
+					for (var _iterator12 = this._listeners[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+						var listener = _step12.value;
 
 
 						listener.object.off(listener.eventName, listener.callback);
 					}
 
 					// Deconstruct all subviews.
-				} catch (err) {
-					_didIteratorError11 = true;
-					_iteratorError11 = err;
-				} finally {
-					try {
-						if (!_iteratorNormalCompletion11 && _iterator11.return) {
-							_iterator11.return();
-						}
-					} finally {
-						if (_didIteratorError11) {
-							throw _iteratorError11;
-						}
-					}
-				}
-
-				var _iteratorNormalCompletion12 = true;
-				var _didIteratorError12 = false;
-				var _iteratorError12 = undefined;
-
-				try {
-					for (var _iterator12 = this._viewsArray[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
-						var _view3 = _step12.value;
-
-
-						_view3.deconstruct();
-					}
 				} catch (err) {
 					_didIteratorError12 = true;
 					_iteratorError12 = err;
@@ -1255,6 +1288,32 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						}
 					}
 				}
+
+				var _iteratorNormalCompletion13 = true;
+				var _didIteratorError13 = false;
+				var _iteratorError13 = undefined;
+
+				try {
+					for (var _iterator13 = this._viewsArray[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
+						var view = _step13.value;
+
+
+						view.deconstruct();
+					}
+				} catch (err) {
+					_didIteratorError13 = true;
+					_iteratorError13 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion13 && _iterator13.return) {
+							_iterator13.return();
+						}
+					} finally {
+						if (_didIteratorError13) {
+							throw _iteratorError13;
+						}
+					}
+				}
 			}
 		}, {
 			key: "classList",
@@ -1265,7 +1324,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}]);
 
 		return View;
-	}(lrs.Object);
+	}(mix().with(Events));
 
 	var ListView = function (_View) {
 		_inherits(ListView, _View);
@@ -1285,30 +1344,29 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (!this.views.content) this.views.content = [];
 
 				if (this.views.content.length) {
-					var _iteratorNormalCompletion13 = true;
-					var _didIteratorError13 = false;
-					var _iteratorError13 = undefined;
+					var _iteratorNormalCompletion14 = true;
+					var _didIteratorError14 = false;
+					var _iteratorError14 = undefined;
 
 					try {
 
-						for (var _iterator13 = this.views.content[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
-							view = _step13.value;
+						for (var _iterator14 = this.views.content[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
+							var view = _step14.value;
 
 
-							view.owner = null;
-							view.remove().deconstruct();
+							this._removeContentView(view);
 						}
 					} catch (err) {
-						_didIteratorError13 = true;
-						_iteratorError13 = err;
+						_didIteratorError14 = true;
+						_iteratorError14 = err;
 					} finally {
 						try {
-							if (!_iteratorNormalCompletion13 && _iterator13.return) {
-								_iterator13.return();
+							if (!_iteratorNormalCompletion14 && _iterator14.return) {
+								_iterator14.return();
 							}
 						} finally {
-							if (_didIteratorError13) {
-								throw _iteratorError13;
+							if (_didIteratorError14) {
+								throw _iteratorError14;
 							}
 						}
 					}
@@ -1355,16 +1413,25 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			value: function remove(object) {
 
 				var i = this.indexForObject(object);
+				var view = this.views.content[i];
 
 				if (i < 0) return this; //TODO: Throw error?
 
 				this.content.splice(i, 1);
-
-				this.views.content[i].owner = null;
-				this.views.content[i].remove().deinitilize();
 				this.views.content.splice(i, 1);
+				this._removeContentView(view);
 
 				return this;
+			}
+		}, {
+			key: "_removeContentView",
+			value: function _removeContentView(view) {
+
+				this._viewsArray.splice(this._viewsArray.indexOf(view));
+
+				view.remove(false);
+				view.owner = null;
+				view.deconstruct();
 			}
 		}, {
 			key: "sort",
@@ -1375,49 +1442,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				var newContent = [];
 				var newContentViews = [];
 
-				var _iteratorNormalCompletion14 = true;
-				var _didIteratorError14 = false;
-				var _iteratorError14 = undefined;
-
-				try {
-					for (var _iterator14 = content[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
-						var object = _step14.value;
-
-
-						var c = this.content[this.indexForObject(object)];
-						newContent.push(c);
-						newContentViews.push(c.view);
-					}
-				} catch (err) {
-					_didIteratorError14 = true;
-					_iteratorError14 = err;
-				} finally {
-					try {
-						if (!_iteratorNormalCompletion14 && _iterator14.return) {
-							_iterator14.return();
-						}
-					} finally {
-						if (_didIteratorError14) {
-							throw _iteratorError14;
-						}
-					}
-				}
-
-				this.content = newContent;
-				this.views.content = newContentViews;
-
-				this.withdraw();
-
 				var _iteratorNormalCompletion15 = true;
 				var _didIteratorError15 = false;
 				var _iteratorError15 = undefined;
 
 				try {
-					for (var _iterator15 = this.views.content[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
-						var _view4 = _step15.value;
+					for (var _iterator15 = content[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
+						var object = _step15.value;
 
 
-						_view4.appendTo(this);
+						var c = this.content[this.indexForObject(object)];
+						newContent.push(c);
+						newContentViews.push(c.view);
 					}
 				} catch (err) {
 					_didIteratorError15 = true;
@@ -1434,6 +1470,37 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					}
 				}
 
+				this.content = newContent;
+				this.views.content = newContentViews;
+
+				this.withdraw();
+
+				var _iteratorNormalCompletion16 = true;
+				var _didIteratorError16 = false;
+				var _iteratorError16 = undefined;
+
+				try {
+					for (var _iterator16 = this.views.content[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
+						var view = _step16.value;
+
+
+						view.appendTo(this);
+					}
+				} catch (err) {
+					_didIteratorError16 = true;
+					_iteratorError16 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion16 && _iterator16.return) {
+							_iterator16.return();
+						}
+					} finally {
+						if (_didIteratorError16) {
+							throw _iteratorError16;
+						}
+					}
+				}
+
 				this.reinsert();
 
 				return this;
@@ -1442,7 +1509,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			key: "indexForObject",
 			value: function indexForObject(object) {
 
-				for (var i = 0; i < this.content; i++) {
+				for (var i = 0; i < this.content.length; i++) {
 
 					if (this.content[i].object === object) return i;
 				}
@@ -1453,7 +1520,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			key: "indexForView",
 			value: function indexForView(view) {
 
-				for (var i = 0; i < this.content; i++) {
+				for (var i = 0; i < this.content.length; i++) {
 
 					if (this.content[i].view === view) return i;
 				}
@@ -1493,7 +1560,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				}
 
 				if (view.owner) throw new Error('View is already owned by a view');
+				view._name = 'content';
 				view.owner = this;
+				this._viewsArray.push(view);
 
 				if (i === this.views.content.length) {
 
@@ -1543,29 +1612,29 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				this._object = object;
 
-				var _iteratorNormalCompletion16 = true;
-				var _didIteratorError16 = false;
-				var _iteratorError16 = undefined;
+				var _iteratorNormalCompletion17 = true;
+				var _didIteratorError17 = false;
+				var _iteratorError17 = undefined;
 
 				try {
-					for (var _iterator16 = Object.keys(this.outlets)[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
-						var outletName = _step16.value;
+					for (var _iterator17 = Object.keys(this.outlets)[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {
+						var outletName = _step17.value;
 
 
 						var value = object[outletName];
 						if (value !== undefined) this[outletName] = value;
 					}
 				} catch (err) {
-					_didIteratorError16 = true;
-					_iteratorError16 = err;
+					_didIteratorError17 = true;
+					_iteratorError17 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion16 && _iterator16.return) {
-							_iterator16.return();
+						if (!_iteratorNormalCompletion17 && _iterator17.return) {
+							_iterator17.return();
 						}
 					} finally {
-						if (_didIteratorError16) {
-							throw _iteratorError16;
+						if (_didIteratorError17) {
+							throw _iteratorError17;
 						}
 					}
 				}

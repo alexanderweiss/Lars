@@ -6,7 +6,7 @@
 			
 			<button data-view="button"></button>
 				
-			<div data-view="List:list">
+			<div data-view="List:list:li">
 				
 			</div>
 			
@@ -15,6 +15,7 @@
 		</div>
 		<script type="text/html" class="templates">
 			<span class="test1 test2" data-test1="a" data-test2 data-template="test"></span>
+			<div data-template="li" data-outlet="name"></div>
 		</script>
 		<script src="lrs.js"></script>
 		<script>
@@ -30,6 +31,11 @@
 			lrs.View.parseTemplates()
 			
 			var app = new lrs.LRSView({el: document.querySelector('.app')})
+			
+			app.views.list.reset([
+				{ name: 'Hi' },
+				{ name: 'Hallo' }
+			])
 			
 			
 		</script>
