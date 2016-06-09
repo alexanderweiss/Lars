@@ -84,6 +84,8 @@ class View extends mix().with(Events) {
 
 	}
 	
+	// ### createDomConnections
+	// Create all connections to the dom, including subviews, outlets and actions. Will normally be run during construction, but may be delayed through an option.
 	createDomConnections() {
 		
 		if (this._domConnectionsCreated) throw new Error('DOM connections may only be create once.')
@@ -446,7 +448,7 @@ class View extends mix().with(Events) {
 	}
 	
 	// ### addView
-	// Add a view within to this view.
+	// Add a view within this view.
 	addView(view, name) {
 		
 		// Don't add the view if it already the child of another view.
