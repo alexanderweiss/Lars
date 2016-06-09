@@ -1,24 +1,40 @@
+// Setup lrs variable.
 let lrs = window.lrs = {}
 
-let mix = (superclass) => new MixinBuilder(superclass)
-
+// ## Base
+// Base class to extend from. Currently adds no functionality, except allowing classes that don't extend another class to use mixins.
 class Base {}
 
-class MixinBuilder {  
+// ## MixinBuilder
+// Class to extend a superclass with mixins.
+class MixinBuilder {
+	
 	constructor(superclass) {
+		
 		this.superclass = superclass || Base
+		
 	}
 	
-	with(...mixins) { 
+	// ### with
+	// # Return superclass extended with mixins.
+	with(...mixins) {
+		
+		// Extend each mixin with the next, starting from the superclass.
 		return mixins.reduce((c, mixin) => mixin(c), this.superclass)
+		
 	}
 }
 
+// Make MixinBuilder available as function mix, allowing `mix(superclass).with(mixin1, mixin2, ...)` syntax.
+let mix = (superclass) => new MixinBuilder(superclass)
+
+// ## Events
+// Mixin to support class/object events.
 let Events = (superclass) => class extends superclass {
 	
 	constructor() {
 		
-		super()
+		super(...arguments)
 		
 		Object.defineProperty(this, '_events', {
 			value: {},
