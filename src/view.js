@@ -514,6 +514,8 @@ class View extends mix().with(Events) {
 			
 		}
 		
+		view.owner = null
+		
 		return this
 		
 	}
