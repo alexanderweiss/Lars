@@ -125,3 +125,6 @@ let Events = (superclass) => class extends superclass {
 	}
 	
 }
+
+lrs.mix = mix
+lrs.Events = Events
