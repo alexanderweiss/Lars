@@ -173,7 +173,7 @@ class View extends mix().with(Events) {
 				
 				}
 				
-				//Create view.
+				// Create view.
 				view = new (this.constructor.views[info[0]] || this.constructor.views[info[0] + 'View'])({el: viewEl, options})
 				
 			}
@@ -250,18 +250,21 @@ class View extends mix().with(Events) {
 		//Update our internal value.
 		this.updateOutletFromDom(name)
 		
-		Object.defineProperty(this, name, {
-			configurable: true,
-			enumerable: true,
-			get: function() {
-				return this.outlets[name].value
-			},
-			set: function(value) {
-				this.outlets[name].value = value
-				this.updateDomFromOutlet(name)
-				return value
-			}
-		})
+		if (!(name in this)) {
+			
+			Object.defineProperty(this, name, {
+				configurable: true,
+				enumerable: true,
+				get: function() {
+					return this.outlets[name].value
+				},
+				set: function(value) {
+					this.outlets[name].value = value
+					this.updateDomFromOutlet(name)
+					return value
+				}
+			})
+		}
 		
 		return this
 		
