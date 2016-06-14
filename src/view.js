@@ -76,7 +76,7 @@ class View extends mix().with(Events) {
 		}
 		
 		this.hidden = this.el.classList.contains('hidden')
-		this.enabled = !this.el.classList.contains('disabled')
+		this.enabled = this.enabledInput = !this.el.classList.contains('disabled')
 		
 		if (!options || options.delayDomConnectionCreation !== true) this.createDomConnections()
 
