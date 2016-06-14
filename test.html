@@ -4,7 +4,7 @@
 			
 			<span data-outlet="name"></span>
 			
-			<button data-view="button"></button>
+			<button data-view="button" data-action="click:doSomething(name, 'someVal', 'another;val'); mouseleave:another('val', template) ; touchstart:touch()"></button>
 				
 			<div data-view="List:list:li">
 				
@@ -14,15 +14,27 @@
 			
 		</div>
 		<script type="text/html" class="templates">
-			<span class="test1 test2" data-test1="a" data-test2 data-template="test"></span>
+			<span class="test1 test2" data-test1="a" data-test2 data-template="test">
+				<button data-outlet="buttonText"></button>
+			</span>
 			<div data-template="li" data-outlet="name"></div>
 		</script>
-		<script src="lrs.js"></script>
+		<script src="lrs-es6.js"></script>
 		<script>
 			
 			class TestView extends lrs.View {
 				
 				get template() { return 'test' }
+				
+				set buttonText(value) {
+					
+					console.log('set', value)
+					
+					this.outlets.buttonText.value = value
+					this.updateDomFromOutlet('buttonText')
+					
+					
+				}
 				
 			}
 			
