@@ -345,7 +345,7 @@ class View extends mix().with(Events) {
 			let parameters = []
 			
 			// Iterate over all parameters. TODO: preprocess this?
-			for (let parameter in action.parameters) {
+			for (let parameter of action.parameters) {
 				
 				// Check type.
 				if (parameter === 'null') {
@@ -371,7 +371,7 @@ class View extends mix().with(Events) {
 				} else {
 					
 					// Otherwise, consider it a property name and return property value.
-					parameters.push(this[parameter] || this.get(parameter))
+					parameters.push(this[parameter])
 					
 				}
 				
