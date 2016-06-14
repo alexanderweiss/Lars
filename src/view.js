@@ -810,6 +810,8 @@ class ListView extends View {
 		if (!content && (!this.content || this.content.length == 0)) return this
 		
 		if (!this.views.content) this.views.content = []
+		// Withdraw while we're updating.
+		this.withdraw()
 		
 		if (this.views.content.length) {
 			
@@ -834,6 +836,9 @@ class ListView extends View {
 			}
 			
 		}
+		
+		// Reinsert the view.
+		this.reinsert()
 		
 		return this
 		
