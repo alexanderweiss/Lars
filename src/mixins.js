@@ -91,7 +91,7 @@ let Events = (superclass) => class extends superclass {
 		
 		var index = -1
 		
-		for (let i in this._events[eventName]) {
+		for (let i of this._events[eventName].keys()) {
 			
 			if (this._events[eventName][i] === handler || this._events[eventName][i].handler === handler) {
 				
