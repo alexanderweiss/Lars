@@ -592,14 +592,14 @@ class View extends mix().with(Events) {
 	
 	// ### withdraw
 	// Temporarily remove the element from the DOM to perform operations and put back in.
-	withdraw() {
+	withdraw(restoreScrollTop = true) {
 		
 		// Throw error if the view is already withdrawn.
 		if (this._previousState) throw new Error('View is already withdrawn')
 		
 		// Save state.
 		this._previousState = {
-			scrollTop: this.el.scrollTop(),
+			scrollTop: restoreScrollTop ? this.el.scrollTop : null,
 			parentNode: this.el.parentNode,
 			placeholderEl: document.createElement('div')
 		}
@@ -617,7 +617,7 @@ class View extends mix().with(Events) {
 		if (!this._previousState) throw new Error('View is not withdrawn')
 		
 		this._previousState.parentNode.replaceChild(this.el, this._previousState.placeholderEl)
-		this.el.scrollTop = this._previousState.scrollTop
+		if (this._previousState.scrollTop) this.el.scrollTop = this._previousState.scrollTop
 		
 		this._previousState = null
 		
