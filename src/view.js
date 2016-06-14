@@ -805,11 +805,20 @@ class View extends mix().with(Events) {
 
 class ListView extends View {
 	
+	constructor() {
+		
+		super(...arguments)
+		
+		if (this.views.content) throw new Error('ListView currently does not allow setting content from DOM.')
+		
+		this.views.content = []
+		
+	}
+	
 	reset(content) {
 		
 		if (!content && (!this.content || this.content.length == 0)) return this
 		
-		if (!this.views.content) this.views.content = []
 		// Withdraw while we're updating.
 		this.withdraw()
 		
