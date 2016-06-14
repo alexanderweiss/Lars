@@ -22,6 +22,9 @@ function scripts() {
 		]))
 		.pipe(concat('lrs.js'))
 		.pipe(iife())
+		.pipe(rename({suffix: '-es6'}))
+		.pipe(gulp.dest('./'))
+		.pipe(rename({basename: 'lrs'}))
 		.pipe(babel({
 			presets: ['es2015']
 		}))

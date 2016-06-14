@@ -139,12 +139,33 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 					var index = -1;
 
-					for (var i in this._events[eventName]) {
+					var _iteratorNormalCompletion = true;
+					var _didIteratorError = false;
+					var _iteratorError = undefined;
 
-						if (this._events[eventName][i] === handler || this._events[eventName][i].handler === handler) {
+					try {
+						for (var _iterator = this._events[eventName].keys()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+							var i = _step.value;
 
-							index = i;
-							break;
+
+							if (this._events[eventName][i] === handler || this._events[eventName][i].handler === handler) {
+
+								index = i;
+								break;
+							}
+						}
+					} catch (err) {
+						_didIteratorError = true;
+						_iteratorError = err;
+					} finally {
+						try {
+							if (!_iteratorNormalCompletion && _iterator.return) {
+								_iterator.return();
+							}
+						} finally {
+							if (_didIteratorError) {
+								throw _iteratorError;
+							}
 						}
 					}
 
@@ -162,28 +183,28 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 					if (!this._events[eventName]) return this;
 
-					var _iteratorNormalCompletion = true;
-					var _didIteratorError = false;
-					var _iteratorError = undefined;
+					var _iteratorNormalCompletion2 = true;
+					var _didIteratorError2 = false;
+					var _iteratorError2 = undefined;
 
 					try {
-						for (var _iterator = this._events[eventName].slice()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-							var handler = _step.value;
+						for (var _iterator2 = this._events[eventName].slice()[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+							var handler = _step2.value;
 
 
 							handler.apply(this, args);
 						}
 					} catch (err) {
-						_didIteratorError = true;
-						_iteratorError = err;
+						_didIteratorError2 = true;
+						_iteratorError2 = err;
 					} finally {
 						try {
-							if (!_iteratorNormalCompletion && _iterator.return) {
-								_iterator.return();
+							if (!_iteratorNormalCompletion2 && _iterator2.return) {
+								_iterator2.return();
 							}
 						} finally {
-							if (_didIteratorError) {
-								throw _iteratorError;
+							if (_didIteratorError2) {
+								throw _iteratorError2;
 							}
 						}
 					}
@@ -195,6 +216,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			return _class;
 		}(superclass);
 	};
+
+	lrs.mix = mix;
+	lrs.Events = Events;
 	// ## Object
 	// Basic object class with get/set methods and events.
 
@@ -231,13 +255,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				this.templates = {};
 
 				// Go over all elements containing templates.
-				var _iteratorNormalCompletion2 = true;
-				var _didIteratorError2 = false;
-				var _iteratorError2 = undefined;
+				var _iteratorNormalCompletion3 = true;
+				var _didIteratorError3 = false;
+				var _iteratorError3 = undefined;
 
 				try {
-					for (var _iterator2 = Array.from(document.querySelectorAll('.templates'))[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-						var templateContainerEl = _step2.value;
+					for (var _iterator3 = Array.from(document.querySelectorAll('.templates'))[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+						var templateContainerEl = _step3.value;
 
 
 						// Remove it from the DOM first.
@@ -248,13 +272,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						templateContainerHTMLEl.innerHTML = templateContainerEl.innerHTML;
 
 						// Iterate all the children (templates)
-						var _iteratorNormalCompletion3 = true;
-						var _didIteratorError3 = false;
-						var _iteratorError3 = undefined;
+						var _iteratorNormalCompletion4 = true;
+						var _didIteratorError4 = false;
+						var _iteratorError4 = undefined;
 
 						try {
-							for (var _iterator3 = Array.from(templateContainerHTMLEl.children)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-								var templateEl = _step3.value;
+							for (var _iterator4 = Array.from(templateContainerHTMLEl.children)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+								var templateEl = _step4.value;
 
 
 								// If no data-template attribute exists skip this element.
@@ -268,31 +292,31 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 								this.templates[name] = templateEl.outerHTML;
 							}
 						} catch (err) {
-							_didIteratorError3 = true;
-							_iteratorError3 = err;
+							_didIteratorError4 = true;
+							_iteratorError4 = err;
 						} finally {
 							try {
-								if (!_iteratorNormalCompletion3 && _iterator3.return) {
-									_iterator3.return();
+								if (!_iteratorNormalCompletion4 && _iterator4.return) {
+									_iterator4.return();
 								}
 							} finally {
-								if (_didIteratorError3) {
-									throw _iteratorError3;
+								if (_didIteratorError4) {
+									throw _iteratorError4;
 								}
 							}
 						}
 					}
 				} catch (err) {
-					_didIteratorError2 = true;
-					_iteratorError2 = err;
+					_didIteratorError3 = true;
+					_iteratorError3 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion2 && _iterator2.return) {
-							_iterator2.return();
+						if (!_iteratorNormalCompletion3 && _iterator3.return) {
+							_iterator3.return();
 						}
 					} finally {
-						if (_didIteratorError2) {
-							throw _iteratorError2;
+						if (_didIteratorError3) {
+							throw _iteratorError3;
 						}
 					}
 				}
@@ -344,7 +368,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 			}
 
 			_this3.hidden = _this3.el.classList.contains('hidden');
-			_this3.enabled = !_this3.el.classList.contains('disabled');
+			_this3.enabled = _this3.enabledInput = !_this3.el.classList.contains('disabled');
 
 			if (!options || options.delayDomConnectionCreation !== true) _this3.createDomConnections();
 
@@ -383,27 +407,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					var _el$firstChild$classL;
 
 					(_el$firstChild$classL = el.firstChild.classList).add.apply(_el$firstChild$classL, _toConsumableArray(Array.from(definitionEl.classList)));
-					var _iteratorNormalCompletion4 = true;
-					var _didIteratorError4 = false;
-					var _iteratorError4 = undefined;
+					var _iteratorNormalCompletion5 = true;
+					var _didIteratorError5 = false;
+					var _iteratorError5 = undefined;
 
 					try {
-						for (var _iterator4 = Object.keys(definitionEl.dataset)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-							var key = _step4.value;
+						for (var _iterator5 = Object.keys(definitionEl.dataset)[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+							var key = _step5.value;
 
 							el.firstChild.dataset[key] = definitionEl.dataset[key];
 						}
 					} catch (err) {
-						_didIteratorError4 = true;
-						_iteratorError4 = err;
+						_didIteratorError5 = true;
+						_iteratorError5 = err;
 					} finally {
 						try {
-							if (!_iteratorNormalCompletion4 && _iterator4.return) {
-								_iterator4.return();
+							if (!_iteratorNormalCompletion5 && _iterator5.return) {
+								_iterator5.return();
 							}
 						} finally {
-							if (_didIteratorError4) {
-								throw _iteratorError4;
+							if (_didIteratorError5) {
+								throw _iteratorError5;
 							}
 						}
 					}
@@ -425,13 +449,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				this._viewsArray = [];
 
 				// Iterate over all elements that should be views.
-				var _iteratorNormalCompletion5 = true;
-				var _didIteratorError5 = false;
-				var _iteratorError5 = undefined;
+				var _iteratorNormalCompletion6 = true;
+				var _didIteratorError6 = false;
+				var _iteratorError6 = undefined;
 
 				try {
-					for (var _iterator5 = Array.from(this.el.querySelectorAll('[data-view]'))[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-						var viewEl = _step5.value;
+					for (var _iterator6 = Array.from(this.el.querySelectorAll('[data-view]'))[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+						var viewEl = _step6.value;
 
 
 						// Skip the element if it has already been processed (prevents nested views from being reprocessed at the wrong level).
@@ -471,23 +495,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 								}
 							}
 
-							//Create view.
+							// Create view.
 							view = new (this.constructor.views[info[0]] || this.constructor.views[info[0] + 'View'])({ el: viewEl, options: options });
 						}
 
 						this.addView(view, name);
 					}
 				} catch (err) {
-					_didIteratorError5 = true;
-					_iteratorError5 = err;
+					_didIteratorError6 = true;
+					_iteratorError6 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion5 && _iterator5.return) {
-							_iterator5.return();
+						if (!_iteratorNormalCompletion6 && _iterator6.return) {
+							_iterator6.return();
 						}
 					} finally {
-						if (_didIteratorError5) {
-							throw _iteratorError5;
+						if (_didIteratorError6) {
+							throw _iteratorError6;
 						}
 					}
 				}
@@ -508,13 +532,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (this.el.hasAttribute('data-outlet')) this._createOutlet(this.el);
 
 				// Iterate over all elements that should be outlets.
-				var _iteratorNormalCompletion6 = true;
-				var _didIteratorError6 = false;
-				var _iteratorError6 = undefined;
+				var _iteratorNormalCompletion7 = true;
+				var _didIteratorError7 = false;
+				var _iteratorError7 = undefined;
 
 				try {
-					for (var _iterator6 = Array.from(this.el.querySelectorAll('[data-outlet]'))[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-						var outletEl = _step6.value;
+					for (var _iterator7 = Array.from(this.el.querySelectorAll('[data-outlet]'))[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+						var outletEl = _step7.value;
 
 
 						// Create an outlet.
@@ -523,16 +547,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 					// Are any custom outlets defined?
 				} catch (err) {
-					_didIteratorError6 = true;
-					_iteratorError6 = err;
+					_didIteratorError7 = true;
+					_iteratorError7 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion6 && _iterator6.return) {
-							_iterator6.return();
+						if (!_iteratorNormalCompletion7 && _iterator7.return) {
+							_iterator7.return();
 						}
 					} finally {
-						if (_didIteratorError6) {
-							throw _iteratorError6;
+						if (_didIteratorError7) {
+							throw _iteratorError7;
 						}
 					}
 				}
@@ -540,13 +564,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (this.customOutlets) {
 
 					// Yes; iterate over them.
-					var _iteratorNormalCompletion7 = true;
-					var _didIteratorError7 = false;
-					var _iteratorError7 = undefined;
+					var _iteratorNormalCompletion8 = true;
+					var _didIteratorError8 = false;
+					var _iteratorError8 = undefined;
 
 					try {
-						for (var _iterator7 = Object.keys(this.customOutlets)[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-							var customOutletName = _step7.value;
+						for (var _iterator8 = Object.keys(this.customOutlets)[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+							var customOutletName = _step8.value;
 
 
 							// Add them to our outlets and define their type.
@@ -554,16 +578,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 							this.outlets[customOutletName].type = 'custom';
 						}
 					} catch (err) {
-						_didIteratorError7 = true;
-						_iteratorError7 = err;
+						_didIteratorError8 = true;
+						_iteratorError8 = err;
 					} finally {
 						try {
-							if (!_iteratorNormalCompletion7 && _iterator7.return) {
-								_iterator7.return();
+							if (!_iteratorNormalCompletion8 && _iterator8.return) {
+								_iterator8.return();
 							}
 						} finally {
-							if (_didIteratorError7) {
-								throw _iteratorError7;
+							if (_didIteratorError8) {
+								throw _iteratorError8;
 							}
 						}
 					}
@@ -605,18 +629,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				//Update our internal value.
 				this.updateOutletFromDom(name);
 
-				Object.defineProperty(this, name, {
-					configurable: true,
-					enumerable: true,
-					get: function get() {
-						return this.outlets[name].value;
-					},
-					set: function set(value) {
-						this.outlets[name].value = value;
-						this.updateDomFromOutlet(name);
-						return value;
-					}
-				});
+				if (!(name in this)) {
+
+					Object.defineProperty(this, name, {
+						configurable: true,
+						enumerable: true,
+						get: function get() {
+							return this.outlets[name].value;
+						},
+						set: function set(value) {
+							this.outlets[name].value = value;
+							this.updateDomFromOutlet(name);
+							return value;
+						}
+					});
+				}
 
 				return this;
 			}
@@ -634,29 +661,29 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (this.el.hasAttribute('data-action')) this._createAction(this.el);
 
 				// Iterate over all elements that should be outlets.
-				var _iteratorNormalCompletion8 = true;
-				var _didIteratorError8 = false;
-				var _iteratorError8 = undefined;
+				var _iteratorNormalCompletion9 = true;
+				var _didIteratorError9 = false;
+				var _iteratorError9 = undefined;
 
 				try {
-					for (var _iterator8 = Array.from(this.el.querySelectorAll('[data-action]'))[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-						var actionEl = _step8.value;
+					for (var _iterator9 = Array.from(this.el.querySelectorAll('[data-action]'))[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+						var actionEl = _step9.value;
 
 
 						// Create an outlet.
 						this._createAction(actionEl);
 					}
 				} catch (err) {
-					_didIteratorError8 = true;
-					_iteratorError8 = err;
+					_didIteratorError9 = true;
+					_iteratorError9 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion8 && _iterator8.return) {
-							_iterator8.return();
+						if (!_iteratorNormalCompletion9 && _iterator9.return) {
+							_iterator9.return();
 						}
 					} finally {
-						if (_didIteratorError8) {
-							throw _iteratorError8;
+						if (_didIteratorError9) {
+							throw _iteratorError9;
 						}
 					}
 				}
@@ -674,19 +701,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				var self = this;
 
 				// Get information from element.
-				var actionStrings = el.getAttribute('data-action').split(';');
+				var actionStrings = el.getAttribute('data-action').split(/;(?=[^'"]*?\()/);
 
 				// Remove action attribute.
 				el.removeAttribute('data-action');
 
 				// Iterate over all the seperated action strings.
-				var _iteratorNormalCompletion9 = true;
-				var _didIteratorError9 = false;
-				var _iteratorError9 = undefined;
+				var _iteratorNormalCompletion10 = true;
+				var _didIteratorError10 = false;
+				var _iteratorError10 = undefined;
 
 				try {
-					for (var _iterator9 = actionStrings[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-						var actionString = _step9.value;
+					for (var _iterator10 = actionStrings[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+						var actionString = _step10.value;
 
 
 						// Parse.
@@ -700,7 +727,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						var parameterString = _actionString$match2[4];
 
 
-						var parameters = parameterString.split(',');
+						var parameters = parameterString.split(/\s*,\s*/);
 						if (parameters.length === 1 && parameters[0] === '') parameters = [];
 
 						// TODO: Preprocess parameters?
@@ -715,16 +742,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						});
 					}
 				} catch (err) {
-					_didIteratorError9 = true;
-					_iteratorError9 = err;
+					_didIteratorError10 = true;
+					_iteratorError10 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion9 && _iterator9.return) {
-							_iterator9.return();
+						if (!_iteratorNormalCompletion10 && _iterator10.return) {
+							_iterator10.return();
 						}
 					} finally {
-						if (_didIteratorError9) {
-							throw _iteratorError9;
+						if (_didIteratorError10) {
+							throw _iteratorError10;
 						}
 					}
 				}
@@ -749,13 +776,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (!actions) return;
 
 				// Iterate over all actions.
-				var _iteratorNormalCompletion10 = true;
-				var _didIteratorError10 = false;
-				var _iteratorError10 = undefined;
+				var _iteratorNormalCompletion11 = true;
+				var _didIteratorError11 = false;
+				var _iteratorError11 = undefined;
 
 				try {
-					for (var _iterator10 = actions[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
-						var action = _step10.value;
+					for (var _iterator11 = actions[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+						var action = _step11.value;
 
 
 						// Check if the action belongs to the element that we are delegating for.
@@ -764,49 +791,71 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						var parameters = [];
 
 						// Iterate over all parameters. TODO: preprocess this?
-						for (var parameter in action.parameters) {
+						var _iteratorNormalCompletion12 = true;
+						var _didIteratorError12 = false;
+						var _iteratorError12 = undefined;
 
-							// Check type.
-							if (parameter === 'null') {
+						try {
+							for (var _iterator12 = action.parameters[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+								var parameter = _step12.value;
 
-								// If null string, return null.
-								parameters.push(null);
-							} else if (parameter == 'undefined') {
 
-								// If undefined string, return undefined.
-								parameters.push(undefined);
-							} else if (parameter.charAt(0).match(/['"]/g) && parameter.charAt(0) === parameter.charAt(parameter.length - 1)) {
+								// Check type.
+								if (parameter === 'null') {
 
-								// If string with string delimiters, return the delimited string.
-								parameters.push(parameter.substring(1, parameter.length - 1));
-							} else if (parameter.match(/^\d*$/) /*(let number = parseInt(parameter, 10)).toString() == parameter*/) {
+									// If null string, return null.
+									parameters.push(null);
+								} else if (parameter == 'undefined') {
 
-									// If only numbers, return parsed int.
-									parameters.push(parseInt(parameter, 10));
-								} else {
+									// If undefined string, return undefined.
+									parameters.push(undefined);
+								} else if (parameter.charAt(0).match(/['"]/g) && parameter.charAt(0) === parameter.charAt(parameter.length - 1)) {
 
-								// Otherwise, consider it a property name and return property value.
-								parameters.push(this[parameter] || this.get(parameter));
+									// If string with string delimiters, return the delimited string.
+									parameters.push(parameter.substring(1, parameter.length - 1));
+								} else if (parameter.match(/^\d*$/) /*(let number = parseInt(parameter, 10)).toString() == parameter*/) {
+
+										// If only numbers, return parsed int.
+										parameters.push(parseInt(parameter, 10));
+									} else {
+
+									// Otherwise, consider it a property name and return property value.
+									parameters.push(this[parameter]);
+								}
+							}
+
+							// Add default parameters to parameters.
+						} catch (err) {
+							_didIteratorError12 = true;
+							_iteratorError12 = err;
+						} finally {
+							try {
+								if (!_iteratorNormalCompletion12 && _iterator12.return) {
+									_iterator12.return();
+								}
+							} finally {
+								if (_didIteratorError12) {
+									throw _iteratorError12;
+								}
 							}
 						}
 
-						// Add default parameters to parameters.
 						parameters.push(this, el, e);
 
 						// Dispatch action.
 						this.dispatch(action.name + 'Action', parameters);
 					}
 				} catch (err) {
-					_didIteratorError10 = true;
-					_iteratorError10 = err;
+					_didIteratorError11 = true;
+					_iteratorError11 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion10 && _iterator10.return) {
-							_iterator10.return();
+						if (!_iteratorNormalCompletion11 && _iterator11.return) {
+							_iterator11.return();
 						}
 					} finally {
-						if (_didIteratorError10) {
-							throw _iteratorError10;
+						if (_didIteratorError11) {
+							throw _iteratorError11;
 						}
 					}
 				}
@@ -1033,13 +1082,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 		}, {
 			key: "withdraw",
 			value: function withdraw() {
+				var restoreScrollTop = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+
 
 				// Throw error if the view is already withdrawn.
 				if (this._previousState) throw new Error('View is already withdrawn');
 
 				// Save state.
 				this._previousState = {
-					scrollTop: this.el.scrollTop(),
+					scrollTop: restoreScrollTop ? this.el.scrollTop : null,
 					parentNode: this.el.parentNode,
 					placeholderEl: document.createElement('div')
 				};
@@ -1056,7 +1107,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (!this._previousState) throw new Error('View is not withdrawn');
 
 				this._previousState.parentNode.replaceChild(this.el, this._previousState.placeholderEl);
-				this.el.scrollTop = this._previousState.scrollTop;
+				if (this._previousState.scrollTop) this.el.scrollTop = this._previousState.scrollTop;
 
 				this._previousState = null;
 
@@ -1102,13 +1153,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (recursive === true) {
 
 					// No; go over all subviews.
-					var _iteratorNormalCompletion11 = true;
-					var _didIteratorError11 = false;
-					var _iteratorError11 = undefined;
+					var _iteratorNormalCompletion13 = true;
+					var _didIteratorError13 = false;
+					var _iteratorError13 = undefined;
 
 					try {
-						for (var _iterator11 = this._viewsArray[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
-							var view = _step11.value;
+						for (var _iterator13 = this._viewsArray[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
+							var view = _step13.value;
 
 
 							// Update enabled state of subviews (only updateClass if specifically enabled for recursive updates)
@@ -1120,16 +1171,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 							});
 						}
 					} catch (err) {
-						_didIteratorError11 = true;
-						_iteratorError11 = err;
+						_didIteratorError13 = true;
+						_iteratorError13 = err;
 					} finally {
 						try {
-							if (!_iteratorNormalCompletion11 && _iterator11.return) {
-								_iterator11.return();
+							if (!_iteratorNormalCompletion13 && _iterator13.return) {
+								_iterator13.return();
 							}
 						} finally {
-							if (_didIteratorError11) {
-								throw _iteratorError11;
+							if (_didIteratorError13) {
+								throw _iteratorError13;
 							}
 						}
 					}
@@ -1261,13 +1312,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				if (this.owner) throw new Error('View may not be in view stack. Call remove() first.');
 
 				// Go over all registered listeners and stop listening.
-				var _iteratorNormalCompletion12 = true;
-				var _didIteratorError12 = false;
-				var _iteratorError12 = undefined;
+				var _iteratorNormalCompletion14 = true;
+				var _didIteratorError14 = false;
+				var _iteratorError14 = undefined;
 
 				try {
-					for (var _iterator12 = this._listeners[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
-						var listener = _step12.value;
+					for (var _iterator14 = this._listeners[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
+						var listener = _step14.value;
 
 
 						listener.object.off(listener.eventName, listener.callback);
@@ -1275,185 +1326,30 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 					// Deconstruct all subviews.
 				} catch (err) {
-					_didIteratorError12 = true;
-					_iteratorError12 = err;
+					_didIteratorError14 = true;
+					_iteratorError14 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion12 && _iterator12.return) {
-							_iterator12.return();
+						if (!_iteratorNormalCompletion14 && _iterator14.return) {
+							_iterator14.return();
 						}
 					} finally {
-						if (_didIteratorError12) {
-							throw _iteratorError12;
+						if (_didIteratorError14) {
+							throw _iteratorError14;
 						}
 					}
 				}
-
-				var _iteratorNormalCompletion13 = true;
-				var _didIteratorError13 = false;
-				var _iteratorError13 = undefined;
-
-				try {
-					for (var _iterator13 = this._viewsArray[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
-						var view = _step13.value;
-
-
-						view.deconstruct();
-					}
-				} catch (err) {
-					_didIteratorError13 = true;
-					_iteratorError13 = err;
-				} finally {
-					try {
-						if (!_iteratorNormalCompletion13 && _iterator13.return) {
-							_iterator13.return();
-						}
-					} finally {
-						if (_didIteratorError13) {
-							throw _iteratorError13;
-						}
-					}
-				}
-			}
-		}, {
-			key: "classList",
-			get: function get() {
-
-				return this.el.classList;
-			}
-		}]);
-
-		return View;
-	}(mix().with(Events));
-
-	var ListView = function (_View) {
-		_inherits(ListView, _View);
-
-		function ListView() {
-			_classCallCheck(this, ListView);
-
-			return _possibleConstructorReturn(this, Object.getPrototypeOf(ListView).apply(this, arguments));
-		}
-
-		_createClass(ListView, [{
-			key: "reset",
-			value: function reset(content) {
-
-				if (!content && (!this.content || this.content.length == 0)) return this;
-
-				if (!this.views.content) this.views.content = [];
-
-				if (this.views.content.length) {
-					var _iteratorNormalCompletion14 = true;
-					var _didIteratorError14 = false;
-					var _iteratorError14 = undefined;
-
-					try {
-
-						for (var _iterator14 = this.views.content[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
-							var view = _step14.value;
-
-
-							this._removeContentView(view);
-						}
-					} catch (err) {
-						_didIteratorError14 = true;
-						_iteratorError14 = err;
-					} finally {
-						try {
-							if (!_iteratorNormalCompletion14 && _iterator14.return) {
-								_iterator14.return();
-							}
-						} finally {
-							if (_didIteratorError14) {
-								throw _iteratorError14;
-							}
-						}
-					}
-
-					this.views.content = [];
-				}
-
-				this.content = [];
-
-				if (content) {
-
-					for (var i = 0; i < content.length; i++) {
-
-						this._processObject(content[i], i);
-					}
-				}
-
-				return this;
-			}
-		}, {
-			key: "add",
-			value: function add(object, before) {
-
-				var i;
-
-				if (before === true) {
-
-					i = 0;
-				} else if (before === false) {
-
-					i = this.content.length;
-				} else {
-
-					i = this.indexForObject(before);
-					if (i < 0) i = this.content.length;
-				}
-
-				this._processObject(object, i);
-
-				return this;
-			}
-		}, {
-			key: "remove",
-			value: function remove(object) {
-
-				var i = this.indexForObject(object);
-				var view = this.views.content[i];
-
-				if (i < 0) return this; //TODO: Throw error?
-
-				this.content.splice(i, 1);
-				this.views.content.splice(i, 1);
-				this._removeContentView(view);
-
-				return this;
-			}
-		}, {
-			key: "_removeContentView",
-			value: function _removeContentView(view) {
-
-				this._viewsArray.splice(this._viewsArray.indexOf(view));
-
-				view.remove(false);
-				view.owner = null;
-				view.deconstruct();
-			}
-		}, {
-			key: "sort",
-			value: function sort(content) {
-
-				if (!content.length || !this.content) return this;
-
-				var newContent = [];
-				var newContentViews = [];
 
 				var _iteratorNormalCompletion15 = true;
 				var _didIteratorError15 = false;
 				var _iteratorError15 = undefined;
 
 				try {
-					for (var _iterator15 = content[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
-						var object = _step15.value;
+					for (var _iterator15 = this._viewsArray[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
+						var view = _step15.value;
 
 
-						var c = this.content[this.indexForObject(object)];
-						newContent.push(c);
-						newContentViews.push(c.view);
+						view.deconstruct();
 					}
 				} catch (err) {
 					_didIteratorError15 = true;
@@ -1469,34 +1365,230 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 						}
 					}
 				}
+			}
+		}, {
+			key: "classList",
+			get: function get() {
+
+				return this.el.classList;
+			}
+		}]);
+
+		return View;
+	}(mix().with(Events));
+
+	// ## ListView
+	// View that automatically manages a set of content views based on an array of data (objects).
+
+
+	var ListView = function (_View) {
+		_inherits(ListView, _View);
+
+		function ListView() {
+			_classCallCheck(this, ListView);
+
+			var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(ListView).apply(this, arguments));
+
+			if (_this4.views.content) throw new Error('ListView currently does not allow setting content from DOM.');
+
+			_this4.views.content = [];
+
+			return _this4;
+		}
+
+		// ### Reset
+		// Replace data with new data.
+
+
+		_createClass(ListView, [{
+			key: "reset",
+			value: function reset(content) {
+
+				// If nothing is provided and we have no content, there's nothing to do.
+				if (!content && (!this.content || this.content.length == 0)) return this;
+
+				// Withdraw while we're updating.
+				this.withdraw();
+
+				// If there are content views, remove all of them.
+				if (this.views.content.length) {
+					var _iteratorNormalCompletion16 = true;
+					var _didIteratorError16 = false;
+					var _iteratorError16 = undefined;
+
+					try {
+
+						for (var _iterator16 = this.views.content[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
+							var view = _step16.value;
+
+
+							this._removeContentView(view);
+						}
+					} catch (err) {
+						_didIteratorError16 = true;
+						_iteratorError16 = err;
+					} finally {
+						try {
+							if (!_iteratorNormalCompletion16 && _iterator16.return) {
+								_iterator16.return();
+							}
+						} finally {
+							if (_didIteratorError16) {
+								throw _iteratorError16;
+							}
+						}
+					}
+
+					this.views.content = [];
+				}
+
+				// Reset content.
+				this.content = [];
+
+				// If content was provided, process all objects in the data provided.
+				if (content) {
+
+					for (var i = 0; i < content.length; i++) {
+
+						this._processObject(content[i], i);
+					}
+				}
+
+				// Reinsert the view.
+				this.reinsert();
+
+				return this;
+			}
+
+			// ### add
+			// Add an object at a specific position the array.
+
+		}, {
+			key: "add",
+			value: function add(object, before) {
+
+				var i;
+
+				// Check before.
+				if (before === true) {
+
+					// If before is true, put in front.
+					i = 0;
+				} else if (before === false) {
+
+					// If before is false, put at back.
+					i = this.content.length;
+				} else {
+
+					// Otherwise, find the index of the before value and put it before that.
+					i = this.indexForObject(before);
+					// If none is found, put it at the back.
+					if (i < 0) i = this.content.length;
+				}
+
+				// Process the object.
+				this._processObject(object, i);
+
+				return this;
+			}
+
+			// ### remove
+			// Remove an object from the array.
+
+		}, {
+			key: "remove",
+			value: function remove(object) {
+
+				// Get the index and the view.
+				var i = this.indexForObject(object);
+				var view = this.views.content[i];
+
+				// If there is no object, don't do anything.
+				if (i < 0) return this; //TODO: Throw error?
+
+				// Remove from the arrays and remove the view.
+				this.content.splice(i, 1);
+				this.views.content.splice(i, 1);
+				this._removeContentView(view);
+
+				return this;
+			}
+
+			// ### sort
+			// Update the view order after the array has been sorted.
+
+		}, {
+			key: "sort",
+			value: function sort(content) {
+
+				// Don't do anything if there is no data.
+				if (!content.length || !this.content) return this;
+
+				var newContent = [];
+				var newContentViews = [];
+
+				// Find the content object (including view) for each content item and add that to the different content arrays so these are ordered correctly.
+				var _iteratorNormalCompletion17 = true;
+				var _didIteratorError17 = false;
+				var _iteratorError17 = undefined;
+
+				try {
+					for (var _iterator17 = content[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {
+						var object = _step17.value;
+
+
+						var c = this.content[this.indexForObject(object)];
+						newContent.push(c);
+						newContentViews.push(c.view);
+					}
+
+					// Overwrite the old arrays with the newly sorted arrays.
+				} catch (err) {
+					_didIteratorError17 = true;
+					_iteratorError17 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion17 && _iterator17.return) {
+							_iterator17.return();
+						}
+					} finally {
+						if (_didIteratorError17) {
+							throw _iteratorError17;
+						}
+					}
+				}
 
 				this.content = newContent;
 				this.views.content = newContentViews;
 
+				// Withdraw.
 				this.withdraw();
 
-				var _iteratorNormalCompletion16 = true;
-				var _didIteratorError16 = false;
-				var _iteratorError16 = undefined;
+				// Re-add all views in order.
+				var _iteratorNormalCompletion18 = true;
+				var _didIteratorError18 = false;
+				var _iteratorError18 = undefined;
 
 				try {
-					for (var _iterator16 = this.views.content[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
-						var view = _step16.value;
+					for (var _iterator18 = this.views.content[Symbol.iterator](), _step18; !(_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done); _iteratorNormalCompletion18 = true) {
+						var view = _step18.value;
 
 
 						view.appendTo(this);
 					}
+
+					// Reinsert.
 				} catch (err) {
-					_didIteratorError16 = true;
-					_iteratorError16 = err;
+					_didIteratorError18 = true;
+					_iteratorError18 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion16 && _iterator16.return) {
-							_iterator16.return();
+						if (!_iteratorNormalCompletion18 && _iterator18.return) {
+							_iterator18.return();
 						}
 					} finally {
-						if (_didIteratorError16) {
-							throw _iteratorError16;
+						if (_didIteratorError18) {
+							throw _iteratorError18;
 						}
 					}
 				}
@@ -1505,53 +1597,81 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				return this;
 			}
+
+			// ### indexForObject
+			// Retrieve the index of an object in the content array.
+
 		}, {
 			key: "indexForObject",
 			value: function indexForObject(object) {
 
+				// Go over the content array and return the index at which the object is found.
 				for (var i = 0; i < this.content.length; i++) {
 
 					if (this.content[i].object === object) return i;
 				}
 
+				// Otherwise return -1.
 				return -1;
 			}
+
+			// ### indexForView
+			// Retrieve the index of a view belonging to an object in the content array.
+
 		}, {
 			key: "indexForView",
 			value: function indexForView(view) {
 
+				// Go over the content array and return the index if the view is found.
 				for (var i = 0; i < this.content.length; i++) {
 
 					if (this.content[i].view === view) return i;
 				}
 
+				// Otherwise return -1.
 				return -1;
 			}
+
+			// ### viewForObject
+			// Retrieve the view for an object.
+
 		}, {
 			key: "viewForObject",
 			value: function viewForObject(object) {
 
+				// Get the index.
 				var i = this.indexForObject(object);
+				// If the object isn't found, return undefined. TODO: Error?
 				if (i < 0) return undefined;
+				// Return the view at that index.
 				return this.content[i].view;
 			}
+
+			// ### `private` _processObject
+			// Create and append a view for an object.
+
 		}, {
 			key: "_processObject",
 			value: function _processObject(object, i) {
 
 				var view;
 
+				// Check if the object is a view itself.
 				if (object instanceof View) {
 
+					// Yes; just use that as the view.
 					view = object;
 				} else {
 
+					// No; check if there's a defaultChildClass.
 					if (this.options.defaultChildClass) {
 
+						// Yes; create an instance of that class and set the object.
 						view = new this.options.defaultChildClass();
 						view.object = object;
 					} else {
 
+						// No; create a GeneratedListItemView, with the defaultChildTemplate (if provided) and set the object.
 						view = new GeneratedListItemView({
 							template: this.options.defaultChildTemplate
 						});
@@ -1559,11 +1679,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					}
 				}
 
+				// Bypass View.addView, but make sure the result is the same.
 				if (view.owner) throw new Error('View is already owned by a view');
 				view._name = 'content';
 				view.owner = this;
 				this._viewsArray.push(view);
 
+				// Add the view at the end, or before whatever view is at the index provided.
 				if (i === this.views.content.length) {
 
 					view.appendTo(this);
@@ -1572,10 +1694,25 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					view.insertBefore(this.views.content[i]);
 				}
 
+				// Add to the arrays.
 				this.content.splice(i, 0, { object: object, view: view });
 				this.views.content.splice(i, 0, view);
 
 				return view;
+			}
+
+			// ### `private` _removeContentView
+			// Remove a view from the view stack. ListView alternative to removeView.
+
+		}, {
+			key: "_removeContentView",
+			value: function _removeContentView(view) {
+
+				this._viewsArray.splice(this._viewsArray.indexOf(view));
+
+				view.remove(false);
+				view.owner = null;
+				view.deconstruct();
 			}
 		}]);
 
@@ -1612,29 +1749,30 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 				this._object = object;
 
-				var _iteratorNormalCompletion17 = true;
-				var _didIteratorError17 = false;
-				var _iteratorError17 = undefined;
+				// For each outlet, if the object has a property corresponding to it, set that outlet.
+				var _iteratorNormalCompletion19 = true;
+				var _didIteratorError19 = false;
+				var _iteratorError19 = undefined;
 
 				try {
-					for (var _iterator17 = Object.keys(this.outlets)[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {
-						var outletName = _step17.value;
+					for (var _iterator19 = Object.keys(this.outlets)[Symbol.iterator](), _step19; !(_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done); _iteratorNormalCompletion19 = true) {
+						var outletName = _step19.value;
 
 
 						var value = object[outletName];
 						if (value !== undefined) this[outletName] = value;
 					}
 				} catch (err) {
-					_didIteratorError17 = true;
-					_iteratorError17 = err;
+					_didIteratorError19 = true;
+					_iteratorError19 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion17 && _iterator17.return) {
-							_iterator17.return();
+						if (!_iteratorNormalCompletion19 && _iterator19.return) {
+							_iterator19.return();
 						}
 					} finally {
-						if (_didIteratorError17) {
-							throw _iteratorError17;
+						if (_didIteratorError19) {
+							throw _iteratorError19;
 						}
 					}
 				}
@@ -1708,7 +1846,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 	View.register(GeneratedListItemView);
 
 	View.isTouch = document.ontouchstart == null;
-	View.actionStringPattern = /^(.*?):([A-Za-z0-9_-]*)(\((.*?)\))?$/;
+	View.actionStringPattern = /^\s*(\S*?):([A-Za-z0-9_-]*)(\((.*?)\))?\s*$/;
 
 	lrs.View = View;
 	lrs.views = View.views;
