@@ -296,7 +296,7 @@ class View extends mix().with(Events) {
 		var self = this
 		
 		// Get information from element.
-		var actionStrings = el.getAttribute('data-action').split(';')
+		var actionStrings = el.getAttribute('data-action').split(/;(?=[^'"]*?\()/)
 		
 		// Remove action attribute.
 		el.removeAttribute('data-action')
@@ -307,7 +307,7 @@ class View extends mix().with(Events) {
 			// Parse.
 			let [, eventName, name, , parameterString] = actionString.match(this.constructor.actionStringPattern)
 			
-			let parameters = parameterString.split(',')
+			let parameters = parameterString.split(/\s*,\s*/)
 			if (parameters.length === 1 && parameters[0] === '') parameters = []
 			
 			// TODO: Preprocess parameters?
@@ -1156,7 +1156,7 @@ View.register(ListItemView)
 View.register(GeneratedListItemView)
 
 View.isTouch = document.ontouchstart == null
-View.actionStringPattern = /^(.*?):([A-Za-z0-9_-]*)(\((.*?)\))?$/
+View.actionStringPattern = /^\s*(\S*?):([A-Za-z0-9_-]*)(\((.*?)\))?\s*$/
 
 lrs.View = View
 lrs.views = View.views
