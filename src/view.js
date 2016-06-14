@@ -800,9 +800,10 @@ class View extends mix().with(Events) {
 		
 	}
 	
-	
 }
 
+// ## ListView
+// View that automatically manages a set of content views based on an array of data (objects).
 class ListView extends View {
 	
 	constructor() {
@@ -815,13 +816,17 @@ class ListView extends View {
 		
 	}
 	
+	// ### Reset
+	// Replace data with new data.
 	reset(content) {
 		
+		// If nothing is provided and we have no content, there's nothing to do.
 		if (!content && (!this.content || this.content.length == 0)) return this
 		
 		// Withdraw while we're updating.
 		this.withdraw()
 		
+		// If there are content views, remove all of them.
 		if (this.views.content.length) {
 			
 			for (let view of this.views.content) {
@@ -834,8 +839,10 @@ class ListView extends View {
 			
 		}
 		
+		// Reset content.
 		this.content = []
 		
+		// If content was provided, process all objects in the data provided.
 		if (content) {
 			
 			for (let i = 0; i < content.length; i++) {
@@ -853,38 +860,51 @@ class ListView extends View {
 		
 	}
 	
+	// ### add
+	// Add an object at a specific position the array.
 	add(object, before) {
 		
 		var i
 		
+		// Check before.
 		if (before === true) {
 			
+			// If before is true, put in front.
 			i = 0
 			
 		} else if (before === false) {
 			
+			// If before is false, put at back.
 			i = this.content.length
 			
 		} else {
 			
+			// Otherwise, find the index of the before value and put it before that.
 			i = this.indexForObject(before)
+			// If none is found, put it at the back.
 			if (i < 0) i = this.content.length
 			
 		}
 		
+		// Process the object.
 		this._processObject(object, i)
 		
 		return this
 		
 	}
 	
+	// ### remove
+	// Remove an object from the array.
 	remove(object) {
 		
+		// Get the index and the view.
 		var i = this.indexForObject(object)
 		var view = this.views.content[i]
 		
+		// If there is no object, don't do anything.
 		if (i < 0) return this //TODO: Throw error?
 		
+		// Remove from the arrays and remove the view.
 		this.content.splice(i, 1)
 		this.views.content.splice(i, 1)
 		this._removeContentView(view)
@@ -894,23 +914,17 @@ class ListView extends View {
 		
 	}
 	
-	_removeContentView(view) {
-		
-		this._viewsArray.splice(this._viewsArray.indexOf(view))
-		
-		view.remove(false)
-		view.owner = null
-		view.deconstruct()
-		
-	}
-	
+	// ### sort
+	// Update the view order after the array has been sorted.
 	sort(content) {
 		
+		// Don't do anything if there is no data.
 		if (!content.length || !this.content) return this
 		
 		var newContent = []
 		var newContentViews = []
 		
+		// Find the content object (including view) for each content item and add that to the different content arrays so these are ordered correctly.
 		for (let object of content) {
 			
 			let c = this.content[this.indexForObject(object)]
@@ -919,72 +933,96 @@ class ListView extends View {
 			
 		}
 		
+		// Overwrite the old arrays with the newly sorted arrays.
 		this.content = newContent
 		this.views.content = newContentViews
 		
+		// Withdraw.
 		this.withdraw()
 		
+		// Re-add all views in order.
 		for (let view of this.views.content) {
 			
 			view.appendTo(this)
 			
 		}
 		
+		// Reinsert.
 		this.reinsert()
 		
 		return this
 		
 	}
 	
+	// ### indexForObject
+	// Retrieve the index of an object in the content array.
 	indexForObject(object) {
 		
+		// Go over the content array and return the index at which the object is found.
 		for (let i = 0; i < this.content.length; i++) {
 			
 			if (this.content[i].object === object) return i
 			
 		}
 		
+		// Otherwise return -1.
 		return -1
 		
 	}
 	
+	// ### indexForView
+	// Retrieve the index of a view belonging to an object in the content array.
 	indexForView(view) {
 		
+		// Go over the content array and return the index if the view is found.
 		for (let i = 0; i < this.content.length; i++) {
 			
 			if (this.content[i].view === view) return i
 			
 		}
 		
+		// Otherwise return -1.
 		return -1
 		
 	}
 	
+	// ### viewForObject
+	// Retrieve the view for an object.
 	viewForObject(object) {
 		
+		// Get the index.
 		var i = this.indexForObject(object)
+		// If the object isn't found, return undefined. TODO: Error?
 		if (i < 0) return undefined
+		// Return the view at that index.
 		return this.content[i].view
 		
 	}
 	
+	// ### `private` _processObject
+	// Create and append a view for an object.
 	_processObject(object, i) {
 		
 		var view
 		
+		// Check if the object is a view itself.
 		if (object instanceof View) {
 			
+			// Yes; just use that as the view.
 			view = object
 			
 		} else {
 			
+			// No; check if there's a defaultChildClass.
 			if (this.options.defaultChildClass) {
 				
+				// Yes; create an instance of that class and set the object.
 				view = new this.options.defaultChildClass()
 				view.object = object
 				
 			} else {
 				
+				// No; create a GeneratedListItemView, with the defaultChildTemplate (if provided) and set the object.
 				view = new GeneratedListItemView({
 					template: this.options.defaultChildTemplate
 				})
@@ -994,11 +1032,13 @@ class ListView extends View {
 			
 		}
 		
+		// Bypass View.addView, but make sure the result is the same.
 		if (view.owner) throw new Error('View is already owned by a view')
 		view._name = 'content'
 		view.owner = this
 		this._viewsArray.push(view)
 		
+		// Add the view at the end, or before whatever view is at the index provided.
 		if (i === this.views.content.length) {
 			
 			view.appendTo(this)
@@ -1009,10 +1049,23 @@ class ListView extends View {
 			
 		}
 		
+		// Add to the arrays.
 		this.content.splice(i, 0, {object, view})
 		this.views.content.splice(i, 0, view)
 		
 		return view
+		
+	}
+	
+	// ### `private` _removeContentView
+	// Remove a view from the view stack. ListView alternative to removeView.
+	_removeContentView(view) {
+		
+		this._viewsArray.splice(this._viewsArray.indexOf(view))
+		
+		view.remove(false)
+		view.owner = null
+		view.deconstruct()
 		
 	}
 	
@@ -1027,6 +1080,7 @@ class GeneratedListItemView extends ListItemView {
 		
 		this._object = object
 		
+		// For each outlet, if the object has a property corresponding to it, set that outlet.
 		for (let outletName of Object.keys(this.outlets)) {
 			
 			let value = object[outletName]
