@@ -173,8 +173,11 @@ class View extends mix().with(Events) {
 
 				}
 
+				let viewClass = this.constructor.views[info[0]] || this.constructor.views[info[0] + 'View']
+				if (!viewClass) throw new Error(`No view class registered for name ${info[0]}`)
+
 				// Create view.
-				view = new (this.constructor.views[info[0]] || this.constructor.views[info[0] + 'View'])({el: viewEl, options})
+				view = new viewClass({el: viewEl, options})
 
 			}
 
